@@ -4,13 +4,18 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 
+export type ChipVariant = 'default' | 'info' | 'success' | 'warning' | 'danger';
+
 @Component({
   selector: 'app-chip',
   standalone: true,
   imports: [NgClass, IonIcon],
   styleUrl: './chip.component.scss',
   template: `
-    <span class="chip" [ngClass]="{ 'chip--selected': selected, 'chip--removable': removable }">
+    <span
+      class="chip"
+      [ngClass]="['chip--' + variant, selected ? 'chip--selected' : '', removable ? 'chip--removable' : '']"
+    >
       <ng-content />
       @if (removable) {
         <ion-icon
@@ -23,6 +28,7 @@ import { closeOutline } from 'ionicons/icons';
   `,
 })
 export class ChipComponent {
+  @Input() variant: ChipVariant = 'default';
   @Input() selected = false;
   @Input() removable = false;
   @Output() remove = new EventEmitter<void>();

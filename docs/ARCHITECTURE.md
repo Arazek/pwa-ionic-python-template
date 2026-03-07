@@ -23,6 +23,7 @@ share the same compose structure with environment-level overrides.
 | DB Admin       | pgAdmin 4                           | latest   |
 | Reverse Proxy  | Traefik                             | v3       |
 | Containerization | Docker + Docker Compose           | latest   |
+| Component Docs  | Storybook                         | v8       |
 
 ---
 
@@ -300,6 +301,39 @@ Traefik generates a self-signed cert for `localhost`. On first run:
 - Chrome: type `thisisunsafe` on the warning page
 - Firefox: Advanced → Accept Risk
 - For mobile testing on same network: access via machine IP, same override
+
+---
+
+## Storybook
+
+Storybook is set up in `frontend/` for developing and documenting shared UI components in isolation.
+
+- **Version**: `@storybook/angular` v8
+- **Config**: `frontend/.storybook/` (`main.ts`, `preview.ts`, `preview-head.html`)
+- **Addons**: `addon-essentials`, `addon-interactions`, `@chromatic-com/storybook`
+- **Autodocs**: enabled — stories tagged with `autodocs` get an auto-generated docs page
+- **Theme toggle**: Light/Dark switcher in the toolbar (toggles `.dark` class on `<body>`)
+- **Font**: Source Sans 3 injected globally via `preview-head.html`
+
+### Story locations
+
+Stories live co-located with their component, exclusively inside `shared/components/`:
+
+```
+shared/components/<name>/
+  <name>.component.ts
+  <name>.component.stories.ts   ← story file
+```
+
+Features do not have stories — only `shared/` components are documented in Storybook.
+
+### Running Storybook
+
+```bash
+# From frontend/
+npm run storybook          # dev server (hot reload)
+npm run build-storybook    # static build
+```
 
 ---
 

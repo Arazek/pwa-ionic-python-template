@@ -9,6 +9,26 @@
     border: 1px solid var(--ion-color-light-shade);
   }
 
+  &--info {
+    border-left: 3px solid var(--ion-color-primary);
+    background: rgba(var(--ion-color-primary-rgb), 0.04);
+  }
+
+  &--success {
+    border-left: 3px solid var(--ion-color-success);
+    background: rgba(var(--ion-color-success-rgb), 0.04);
+  }
+
+  &--warning {
+    border-left: 3px solid var(--ion-color-warning);
+    background: rgba(var(--ion-color-warning-rgb), 0.06);
+  }
+
+  &--danger {
+    border-left: 3px solid var(--ion-color-danger);
+    background: rgba(var(--ion-color-danger-rgb), 0.04);
+  }
+
   &--clickable {
     cursor: pointer;
     transition: box-shadow 0.15s, transform 0.15s;

@@ -27,6 +27,7 @@ fully containerized. Designed as a starting base for future projects.
 | DB Admin       | pgAdmin 4                         |
 | Reverse proxy  | Traefik v3                        |
 | Containers     | Docker + Docker Compose           |
+| Component Docs | Storybook v8                      |
 
 ---
 
@@ -77,6 +78,11 @@ cp .env.example .env          # fill in passwords and secrets
 ./run.sh help                 # full command reference
 ```
 
+To run Storybook (from `frontend/`):
+```bash
+npm run storybook      # dev server with hot reload
+```
+
 Services after `./run.sh dev`:
 - `https://localhost:4443/` — Angular PWA
 - `https://localhost:4443/api/v1/docs` — FastAPI Swagger
@@ -99,7 +105,7 @@ src/app/
 │   ├── tabs/            TabsPage — bottom tab navigation shell
 │   ├── home/            HomePage — welcome screen with logout
 │   └── example/         Full CRUD feature (list + detail pages, NgRx store, API service)
-├── shared/              (empty — add reusable components here)
+├── shared/              Reusable components — each has a co-located .stories.ts
 └── store/               Root NgRx registration (rootReducers, rootEffects)
 ```
 
@@ -158,6 +164,7 @@ Full rules in `docs/CONVENTIONS.md`. Key points:
 - **Python**: Black (88) + Ruff. Type hints everywhere. Async-only DB. Thin endpoints, logic in services.
 - **DB**: plural snake_case tables, UUID PKs, `created_at`/`updated_at` on every table. Alembic only (no `create_all` in prod).
 - **Docker**: multi-stage Dockerfiles (`base` → `development` → `production`). Bind mounts in local only.
+- **Storybook**: stories only for `shared/components/`. Always include `tags: ['autodocs']`. Title pattern: `Shared/<Category>/<ComponentName>`. Co-located with component file.
 
 **If the user asks you to violate a convention, flag it and ask for double confirmation before proceeding.**
 

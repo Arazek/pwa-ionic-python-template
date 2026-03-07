@@ -1,5 +1,5 @@
 // ─── Feedback & State ─────────────────────────────────────────────────────────
-export { EmptyStateComponent } from './components/empty-state/empty-state.component';
+export { EmptyStateComponent, EmptyStateVariant } from './components/empty-state/empty-state.component';
 export { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component';
 export { ErrorStateComponent } from './components/error-state/error-state.component';
 export { SuccessStateComponent } from './components/success-state/success-state.component';
@@ -15,12 +15,12 @@ export { ActionSheetService, ActionSheetOptions } from './services/action-sheet.
 // ─── Data Display ─────────────────────────────────────────────────────────────
 export { AvatarComponent, AvatarSize } from './components/avatar/avatar.component';
 export { BadgeComponent, BadgeVariant } from './components/badge/badge.component';
-export { ChipComponent } from './components/chip/chip.component';
+export { ChipComponent, ChipVariant } from './components/chip/chip.component';
 export { ChipListComponent } from './components/chip/chip-list.component';
 
 // ─── Lists & Cards ────────────────────────────────────────────────────────────
 export { ListItemComponent } from './components/list-item/list-item.component';
-export { CardComponent } from './components/card/card.component';
+export { CardComponent, CardVariant } from './components/card/card.component';
 export { SectionComponent } from './components/section/section.component';
 
 // ─── Forms ───────────────────────────────────────────────────────────────────

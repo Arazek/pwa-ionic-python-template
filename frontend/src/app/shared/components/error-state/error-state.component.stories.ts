@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
+import { addIcons } from 'ionicons';
+import { wifiOutline } from 'ionicons/icons';
 import { ErrorStateComponent } from './error-state.component';
 
 const meta: Meta<ErrorStateComponent> = {
@@ -21,6 +23,7 @@ export const Default: Story = {
 };
 
 export const NetworkError: Story = {
+  decorators: [(story) => { addIcons({ wifiOutline }); return story(); }],
   args: {
     icon: 'wifi-outline',
     title: 'No internet connection',

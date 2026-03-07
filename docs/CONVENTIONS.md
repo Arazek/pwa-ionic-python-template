@@ -45,6 +45,7 @@ at the end of your response — do not fix it unless asked.
 7. [Backend — Database & Alembic](#backend--database--alembic)
 8. [Environment Variables](#environment-variables)
 9. [Docker](#docker)
+10. [Storybook](#storybook)
 
 ---
 
@@ -615,3 +616,60 @@ KEYCLOAK_INTERNAL_URL=http://localhost:8080
 - Service names in `docker-compose.yml` are **kebab-case** and match the Traefik router name.
 - Volumes for persistent data are named (not bind-mounted) in production.
 - Bind mounts (source code) are only in `docker-compose.local.yml`.
+
+---
+
+## Storybook
+
+Stories are written only for components in `shared/components/`. Feature components and pages do not get stories.
+
+### File placement
+
+Story files are co-located with the component:
+
+```
+shared/components/chip/
+  chip.component.ts
+  chip.component.stories.ts
+```
+
+### Story file structure
+
+```ts
+import type { Meta, StoryObj } from '@storybook/angular';
+import { MyComponent } from './my.component';
+
+const meta: Meta<MyComponent> = {
+  title: 'Shared/<Category>/<ComponentName>',
+  component: MyComponent,
+  tags: ['autodocs'],          // always include — enables auto docs page
+  argTypes: { ... },
+};
+export default meta;
+type Story = StoryObj<MyComponent>;
+
+export const Default: Story = { args: { ... } };
+export const Variant: Story = { args: { ... } };
+```
+
+### Title naming
+
+Follow the pattern `Shared/<Category>/<ComponentName>`:
+
+| Category      | Use for                                      |
+|---------------|----------------------------------------------|
+| `DataDisplay` | Read-only display: chips, badges, avatars    |
+| `Feedback`    | Status/state: empty state, error, success    |
+| `Forms`       | Inputs: form-field, select, toggle, textarea |
+| `Layout`      | Structure: card, section, divider, list-item |
+| `Navigation`  | Nav elements: page-header, tabs              |
+| `Media`       | Images, logos                                |
+
+### Rules
+
+- Always include `tags: ['autodocs']` on the `meta` object.
+- Export at least a `Default` story.
+- Export named variants for each meaningful visual state.
+- Use `argTypes` to define controls for interactive props.
+- Use `action` for event outputs (`remove`, `click`, etc.).
+- Do not import from `core/` or `features/` inside story files.

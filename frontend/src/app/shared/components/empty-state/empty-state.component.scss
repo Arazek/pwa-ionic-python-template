@@ -12,6 +12,11 @@
     margin-bottom: 16px;
   }
 
+  &--info &__icon    { color: var(--ion-color-primary); }
+  &--success &__icon { color: var(--ion-color-success); }
+  &--warning &__icon { color: var(--ion-color-warning); }
+  &--danger &__icon  { color: var(--ion-color-danger); }
+
   &__title {
     font-size: 18px;
     font-weight: 600;

@@ -1,0 +1,41 @@
+# Environment secrets
+.env
+
+# TLS certificates
+infra/traefik/certs/
+
+# Docker volumes
+.volumes/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Angular
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/www/
+
+# Capacitor native projects (generated, not committed unless needed)
+frontend/android/
+frontend/ios/
+
+# pgAdmin
+infra/pgadmin/data/
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp

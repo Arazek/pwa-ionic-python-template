@@ -1,0 +1,21 @@
+.social-btn {
+  --border-radius: 10px;
+  --border-width: 1.5px;
+  margin-bottom: 12px;
+  font-weight: 500;
+
+  &--google {
+    --color: #4285F4;
+    --border-color: #4285F4;
+  }
+
+  &--facebook {
+    --color: #1877F2;
+    --border-color: #1877F2;
+  }
+
+  &--apple {
+    --color: var(--ion-color-dark);
+    --border-color: var(--ion-color-dark);
+  }
+}

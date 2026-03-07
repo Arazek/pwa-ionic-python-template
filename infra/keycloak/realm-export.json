@@ -115,7 +115,7 @@
 
   "smtpServer": {},
 
-  "loginTheme": "keycloak",
+  "loginTheme": "pwa",
   "accountTheme": "keycloak.v3",
   "adminTheme": "keycloak.v3",
   "emailTheme": "keycloak"

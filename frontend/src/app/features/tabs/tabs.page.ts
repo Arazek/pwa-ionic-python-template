@@ -3,7 +3,7 @@ import {
   IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { home, list } from 'ionicons/icons';
+import { home, list, settingsOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tabs',
@@ -21,12 +21,17 @@ import { home, list } from 'ionicons/icons';
           <ion-icon name="list" />
           <ion-label>Items</ion-label>
         </ion-tab-button>
+
+        <ion-tab-button tab="settings" href="/tabs/settings">
+          <ion-icon name="settings-outline" />
+          <ion-label>Settings</ion-label>
+        </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
   `,
 })
 export class TabsPage {
   constructor() {
-    addIcons({ home, list });
+    addIcons({ home, list, settingsOutline });
   }
 }

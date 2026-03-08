@@ -1,5 +1,6 @@
 import { Preview, applicationConfig, Decorator } from '@storybook/angular';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideIonicAngular } from '@ionic/angular/standalone';
 
 const withTheme: Decorator = (storyFn, context) => {
   const theme = context.globals['theme'] ?? 'light';
@@ -29,7 +30,7 @@ const preview: Preview = {
   decorators: [
     withTheme,
     applicationConfig({
-      providers: [provideAnimations()],
+      providers: [provideAnimations(), provideIonicAngular()],
     }),
   ],
   parameters: {

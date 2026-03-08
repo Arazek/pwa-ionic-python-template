@@ -9,7 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  <title><#if title?has_content>${title?html} — </#if>${(realm.displayName!'')?html}</title>
+  <title><#if title?has_content>${title} — </#if>${(realm.displayName!'')}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
             <circle cx="12" cy="12" r="3" fill="white"/>
           </svg>
         </div>
-        <span class="auth-brand__name">${(realm.displayName!'')?html}</span>
+        <span class="auth-brand__name">${(realm.displayName!'')}</span>
       </div>
 
       <#if message?has_content>

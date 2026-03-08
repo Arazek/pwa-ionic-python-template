@@ -18,7 +18,7 @@
         id="username"
         name="username"
         type="text"
-        value="${(auth.attemptedUsername!'')?html}"
+        value="${(auth.attemptedUsername!'')}"
         autocomplete="username"
         autofocus
       >

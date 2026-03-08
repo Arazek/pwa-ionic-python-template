@@ -18,6 +18,10 @@
     .select-field--error & {
       border-color: var(--ion-color-danger);
     }
+
+    &:focus-within {
+      border-color: var(--ion-color-primary);
+    }
   }
 
   &__select {

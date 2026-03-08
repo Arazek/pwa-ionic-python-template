@@ -341,6 +341,21 @@ Follow [BEM](https://getbem.com/) — Block, Element, Modifier.
 
 Override Ionic's design tokens in `src/theme/variables.scss` only. Never use component-scoped SCSS to override Ionic component styles — use `::part()` for that.
 
+### ThemeService
+
+Use `ThemeService` (from `core/theme/theme.service.ts`) as the single source of truth for color scheme and accent color. Never manipulate `body.dark`, `body.light`, or `body[data-accent]` directly — always go through the service.
+
+```ts
+// Correct
+this.theme.setScheme('dark');
+this.theme.setAccent('clay');
+
+// Wrong — bypasses persistence and signal state
+document.body.classList.add('dark');
+```
+
+`ThemeService` is `providedIn: 'root'` — inject it directly, no provider registration needed.
+
 ```scss
 // variables.scss — global design tokens
 :root {
@@ -616,6 +631,49 @@ KEYCLOAK_INTERNAL_URL=http://localhost:8080
 - Service names in `docker-compose.yml` are **kebab-case** and match the Traefik router name.
 - Volumes for persistent data are named (not bind-mounted) in production.
 - Bind mounts (source code) are only in `docker-compose.local.yml`.
+
+---
+
+## Keycloak Login Theme
+
+The custom `pwa` theme lives in `infra/keycloak/themes/pwa/login/`.
+
+### FreeMarker rules
+
+Keycloak 26 uses FreeMarker with **HTML auto-escaping enabled**. This means:
+
+- **Never use `?html`** — it is a parse error in Keycloak 26 (`?html` is the legacy escaping built-in, forbidden when auto-escaping is on).
+- Use plain `${}` interpolations — they are automatically HTML-escaped.
+- Use `?no_esc` only on values that have already been sanitized (e.g. `${kcSanitize(message.summary)?no_esc}`).
+
+```ftl
+<!-- Correct -->
+<input value="${login.username!''}">
+
+<!-- Wrong — parse error in KC26 -->
+<input value="${(login.username!'')?html}">
+```
+
+### Theme structure
+
+```
+themes/pwa/login/
+  template.ftl             Base layout macro (<@layout.page title=...>)
+  login.ftl                Username/password form + social providers + register link
+  error.ftl                Error page (renders message.summary via kcSanitize + ?no_esc)
+  info.ftl                 Info/confirmation page
+  login-reset-password.ftl Forgot password form
+  login-update-password.ftl Update password form
+  login-verify-email.ftl   Email verification prompt
+  resources/css/login.css  BEM-styled CSS with dark mode via @media (prefers-color-scheme: dark)
+  theme.properties         parent=base, styles=css/login.css
+```
+
+### Realm import
+
+- `realm-export.json` sets `"loginTheme": "pwa"` — applied on first import.
+- If realm already exists, Keycloak skips re-import silently.
+- To update a live realm's theme: `kcadm.sh update realms/pwa -s loginTheme=pwa`
 
 ---
 

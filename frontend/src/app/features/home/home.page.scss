@@ -1,0 +1,47 @@
+.home-content {
+  --background: var(--ion-background-color);
+}
+
+.home-greeting {
+  padding: 24px 20px 8px;
+
+  &__label {
+    font-size: 14px;
+    color: var(--ion-color-medium);
+    margin: 0 0 4px;
+  }
+
+  &__name {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ion-text-color);
+    margin: 0;
+    letter-spacing: -0.02em;
+  }
+}
+
+.home-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.home-card {
+  &__body {
+    padding: 16px;
+  }
+
+  &__label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ion-text-color);
+    margin: 0 0 4px;
+  }
+
+  &__sub {
+    font-size: 12px;
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}

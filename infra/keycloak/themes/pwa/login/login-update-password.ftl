@@ -5,7 +5,7 @@
 
   <form action="${url.loginAction}" method="post" class="auth-form">
 
-    <input type="text" name="username" value="${username?html}" autocomplete="username" style="display:none;" readonly>
+    <input type="text" name="username" value="${username}" autocomplete="username" style="display:none;" readonly>
 
     <div class="auth-field">
       <label class="auth-field__label" for="password-new">${msg("passwordNew")}</label>

@@ -12,18 +12,18 @@
     <#if requiredActions??>
       <ul class="auth-state__list">
         <#list requiredActions as action>
-          <li>${msg("requiredAction.${action}")?html}</li>
+          <li>${msg("requiredAction.${action}")}</li>
         </#list>
       </ul>
     </#if>
     <#if skipLink??>
       <#-- skip link present, no back button needed -->
     <#elseif pageRedirectUri?has_content>
-      <a href="${pageRedirectUri?html}" class="auth-btn auth-btn--primary auth-btn--inline">${msg("doClickHere")}</a>
+      <a href="${pageRedirectUri}" class="auth-btn auth-btn--primary auth-btn--inline">${msg("doClickHere")}</a>
     <#elseif actionUri?has_content>
-      <a href="${actionUri?html}" class="auth-btn auth-btn--primary auth-btn--inline">${msg("proceedWithAction")}</a>
+      <a href="${actionUri}" class="auth-btn auth-btn--primary auth-btn--inline">${msg("proceedWithAction")}</a>
     <#elseif client?? && client.baseUrl?has_content>
-      <a href="${client.baseUrl?html}" class="auth-btn auth-btn--ghost auth-btn--inline">${msg("backToApplication")}</a>
+      <a href="${client.baseUrl}" class="auth-btn auth-btn--ghost auth-btn--inline">${msg("backToApplication")}</a>
     </#if>
   </div>
 

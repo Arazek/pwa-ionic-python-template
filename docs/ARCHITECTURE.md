@@ -53,9 +53,13 @@ pwa-template/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── core/                # Auth, HTTP interceptors, guards, error handling
-│   │   │   │   ├── auth/            # Keycloak service, auth guard, token interceptor
-│   │   │   │   └── interceptors/    # HTTP error interceptor
+│   │   │   │   ├── auth/            # Keycloak service, auth guard, token interceptor, LoginPage
+│   │   │   │   ├── interceptors/    # HTTP error interceptor
+│   │   │   │   └── theme/           # ThemeService — scheme + accent, persisted to localStorage
 │   │   │   ├── features/            # Feature slices (one folder per domain)
+│   │   │   │   ├── tabs/            # TabsPage — bottom tab navigation shell
+│   │   │   │   ├── home/            # HomePage — greeting + avatar + quick-action cards
+│   │   │   │   ├── settings/        # SettingsPage — profile, appearance picker, sign out
 │   │   │   │   └── example/         # Example feature (full NgRx pattern)
 │   │   │   │       ├── components/
 │   │   │   │       ├── pages/
@@ -66,7 +70,8 @@ pwa-template/
 │   │   │   │       │   ├── example.selectors.ts
 │   │   │   │       │   └── example.state.ts
 │   │   │   │       └── example.routes.ts
-│   │   │   ├── shared/              # Shared components, pipes, directives
+│   │   │   ├── shared/              # Shared components, pipes, directives (22 components)
+│   │   │   │   └── index.ts         # Barrel — re-exports all shared components/types
 │   │   │   ├── store/               # Root NgRx store registration
 │   │   │   │   └── app.state.ts
 │   │   │   ├── app.config.ts        # Standalone app config (provideRouter, provideStore...)
@@ -117,7 +122,8 @@ pwa-template/
 │   │   │   └── tls.yml              # Dynamic TLS config (local self-signed)
 │   │   └── certs/                   # Self-signed certs (gitignored)
 │   ├── keycloak/
-│   │   └── realm-export.json        # Pre-configured realm (client, social IdPs skeleton)
+│   │   ├── realm-export.json        # Pre-configured realm (client, social IdPs skeleton)
+│   │   └── themes/pwa/login/        # Custom login theme (FTL templates + login.css)
 │   └── pgadmin/
 │       └── servers.json             # Pre-configured server connection
 │
@@ -163,9 +169,18 @@ Protected endpoint responds
 
 Keycloak Realm pre-configured with:
 - Realm: `pwa`
-- Client: `pwa-frontend` (public, PKCE, redirect URIs for localhost + prod)
-- Identity Providers: Google and Facebook (credentials filled via `.env`)
+- Client: `pwa-frontend` (public, PKCE S256, redirect URIs for `https://localhost:4443/*`, `http://localhost:4200/*`, `capacitor://localhost/*`)
+- Identity Providers: Google and Facebook (disabled by default — enable after adding credentials to `.env`)
 - Roles: `user`, `admin`
+- Login theme: `pwa` (custom FTL templates in `infra/keycloak/themes/pwa/login/`)
+
+**Custom login theme** (`infra/keycloak/themes/pwa/login/`):
+- `template.ftl` — base layout macro (Source Sans 3 font, brand card wrapper)
+- `login.ftl`, `error.ftl`, `info.ftl`, `login-reset-password.ftl`, `login-update-password.ftl`, `login-verify-email.ftl`
+- `resources/css/login.css` — BEM-styled, dark mode via `@media (prefers-color-scheme: dark)`
+- **Important**: Keycloak 26 FreeMarker uses auto-escaping — `?html` is forbidden in templates. Use plain `${}` expressions.
+
+**Realm import quirk**: On fresh DB, Keycloak imports `realm-export.json` automatically. If the realm already exists, import is silently skipped. To force-apply changes to an existing realm use `kcadm.sh` or delete the realm volume.
 
 ---
 
@@ -197,6 +212,44 @@ WS   /api/v1/ws/example          → protected WebSocket
 - **Ionic**: mobile-first layout with tab navigation scaffold
 - **Capacitor**: configured for iOS + Android native builds
 - **PWA**: `@angular/pwa` service worker, `manifest.webmanifest`, offline shell
+
+### Screens
+
+| Route             | Component        | Description                                          |
+|-------------------|------------------|------------------------------------------------------|
+| `/login`          | `LoginPage`      | Logo + social login buttons + "sign in with email"   |
+| `/tabs/home`      | `HomePage`       | Welcome greeting, user avatar, quick-action cards    |
+| `/tabs/settings`  | `SettingsPage`   | Profile info, theme/accent picker, sign out          |
+| `/tabs/example`   | `ExampleListPage`| Example CRUD feature (list + detail)                 |
+
+### Theming System
+
+`ThemeService` (`core/theme/theme.service.ts`) is a signal-based singleton that:
+- Persists `scheme` (`'light' | 'dark' | 'system'`) to `localStorage` and applies `body.light` / `body.dark` class
+- Persists `accent` (`'clay' | 'moss' | 'dune' | 'slate' | null`) to `localStorage` and sets `body[data-accent]`
+
+CSS is in `src/theme/variables.scss`:
+- `:root` — default blue palette + semantic colors
+- `@mixin dark-base` — dark surface/text tokens
+- `@mixin accent-{name}-{light|dark}` — 4 accents × 2 modes (8 mixins)
+- `body.dark` + `body:not(.light):not(.dark) @media (prefers-color-scheme: dark)` — applies dark tokens
+- `body[data-accent='*']` — applies light accent tokens; dark overrides nested inside `body.dark`
+
+The `SettingsPage` exposes the full picker UI (scheme segment + 5 accent swatches).
+
+### Shared Component Library
+
+22 standalone components in `shared/components/`, all barrel-exported from `shared/index.ts`.
+Every component has a co-located `.stories.ts` (Storybook) and `.scss` (BEM-styled).
+
+| Category   | Components |
+|------------|------------|
+| Layout     | Card, Section, Divider, PageHeader, ListItem |
+| Identity   | Avatar, Badge, Logo |
+| Forms      | FormField, SelectField, TextareaField, ToggleField, SearchBar |
+| Feedback   | InlineAlert, ErrorState, SuccessState, EmptyState, LoadingSkeleton |
+| Media      | ImageWithFallback |
+| Auth       | SocialLoginButton, Chip, ChipList |
 
 ### NgRx Store Layout
 ```
@@ -310,10 +363,14 @@ Storybook is set up in `frontend/` for developing and documenting shared UI comp
 
 - **Version**: `@storybook/angular` v8
 - **Config**: `frontend/.storybook/` (`main.ts`, `preview.ts`, `preview-head.html`)
+- **Builder**: `@storybook/angular:start-storybook` Angular architect target (NOT legacy `storybook dev`)
+- **Scripts**: `ng run pwa-template:storybook` (via `angular.json` architect target)
+- **tsconfig**: `tsconfig.storybook.json` — extends base, includes `.storybook/**/*.ts`
 - **Addons**: `addon-essentials`, `addon-interactions`, `@chromatic-com/storybook`
 - **Autodocs**: enabled — stories tagged with `autodocs` get an auto-generated docs page
-- **Theme toggle**: Light/Dark switcher in the toolbar (toggles `.dark` class on `<body>`)
-- **Font**: Source Sans 3 injected globally via `preview-head.html`
+- **Theme toggle**: Light/Dark switcher in toolbar — sets `body.dark` class via `withTheme` decorator in `preview.ts`
+- **Font**: Source Sans 3 injected via `preview-head.html` (NOT imported in `preview.ts` — Angular builder handles global styles via `styles` array)
+- **Coverage**: 88 stories across all 22 shared components
 
 ### Story locations
 
@@ -330,8 +387,9 @@ Features do not have stories — only `shared/` components are documented in Sto
 ### Running Storybook
 
 ```bash
-# From frontend/
-npm run storybook          # dev server (hot reload)
+./run.sh storybook         # via Docker (recommended) → http://localhost:6006
+# or from frontend/:
+npm run storybook          # dev server with hot reload
 npm run build-storybook    # static build
 ```
 

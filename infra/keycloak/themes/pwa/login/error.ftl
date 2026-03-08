@@ -10,7 +10,7 @@
     <h2 class="auth-state__title">${msg("errorTitle")}</h2>
     <p class="auth-state__text">${kcSanitize(message.summary)?no_esc}</p>
     <#if client?? && client.baseUrl?has_content>
-      <a href="${client.baseUrl?html}" class="auth-btn auth-btn--primary auth-btn--inline">
+      <a href="${client.baseUrl}" class="auth-btn auth-btn--primary auth-btn--inline">
         ${msg("backToApplication")}
       </a>
     </#if>

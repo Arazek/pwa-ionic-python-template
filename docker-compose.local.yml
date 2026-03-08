@@ -43,6 +43,7 @@ services:
       - ./frontend/src:/app/src
       - ./frontend/.storybook:/app/.storybook
       - ./frontend/angular.json:/app/angular.json
+      - ./frontend/tsconfig.storybook.json:/app/tsconfig.storybook.json
     ports:
       - "6006:6006"
     command: ["npm", "run", "storybook"]

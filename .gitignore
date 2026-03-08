@@ -20,10 +20,15 @@ dist/
 .ruff_cache/
 
 # Node / Angular
+node_modules/
+package-lock.json
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
 frontend/www/
+
+# Local scripts / ad-hoc tooling (not part of the project)
+capture_stories.js
 
 # Capacitor native projects (generated, not committed unless needed)
 frontend/android/

@@ -99,17 +99,38 @@ First run: browser will warn about the self-signed cert — type `thisisunsafe` 
 ```
 src/app/
 ├── core/
-│   ├── auth/            KeycloakService wrapper, authGuard, LoginPage
-│   └── interceptors/    auth (token injection), error (401 → re-login)
+│   ├── auth/            KeycloakService wrapper, authGuard, LoginPage (Logo + social buttons)
+│   ├── interceptors/    auth (token injection), error (401 → re-login)
+│   └── theme/           ThemeService — scheme (light/dark/system) + accent (clay/moss/dune/slate)
 ├── features/
-│   ├── tabs/            TabsPage — bottom tab navigation shell
-│   ├── home/            HomePage — welcome screen with logout
+│   ├── tabs/            TabsPage — bottom tab navigation (Home, Items, Settings)
+│   ├── home/            HomePage — greeting, avatar in header, quick-action cards
+│   ├── settings/        SettingsPage — profile info, scheme/accent picker, sign out
 │   └── example/         Full CRUD feature (list + detail pages, NgRx store, API service)
-├── shared/              Reusable components — each has a co-located .stories.ts
+├── shared/              22 standalone components, all BEM-styled + Storybook stories
+│   └── index.ts         Barrel — import all shared components from here
 └── store/               Root NgRx registration (rootReducers, rootEffects)
 ```
 
 Entry point: `src/main.ts` → `app.config.ts` (providers: router, store, Keycloak init, HTTP interceptors).
+
+## Theming
+
+`ThemeService` is injected at app root. Two signals: `scheme` and `accent`. Both persist to `localStorage`.
+
+- Call `theme.setScheme('light' | 'dark' | 'system')` and `theme.setAccent('clay' | 'moss' | 'dune' | 'slate' | null)`
+- CSS is in `src/theme/variables.scss` — 8 accent mixins × dark/light, applied via `body.dark` / `body[data-accent]`
+- The `SettingsPage` exposes the full UI (3-way segment + 5 swatches)
+
+## Shared components
+
+All 22 components are in `shared/components/` and exported from `shared/index.ts`. Import from there:
+
+```ts
+import { AvatarComponent, CardComponent, SectionComponent } from '../../shared';
+```
+
+Storybook at `http://localhost:6006` — run via `./run.sh storybook`.
 
 ---
 
@@ -143,12 +164,18 @@ Migrations: `backend/alembic/` — `env.py` reads `settings.DATABASE_URL` and au
 
 Pre-configured realm `pwa` is imported on container startup from `infra/keycloak/realm-export.json`.
 
-- Client: `pwa-frontend` (public, PKCE, redirect URIs for localhost + Capacitor)
+- Client: `pwa-frontend` (public, PKCE S256, redirect URIs for `https://localhost:4443/*`, `http://localhost:4200/*`, `capacitor://localhost/*`)
 - Roles: `user` (default), `admin`
+- Login theme: `pwa` (custom FTL + CSS in `infra/keycloak/themes/pwa/login/`)
 - Identity Providers: Google and Facebook (disabled by default — enable after adding credentials to `.env`)
 - Social IdP redirect URIs (set in Google/Facebook console):
   - `https://$DOMAIN/auth/realms/pwa/broker/google/endpoint`
   - `https://$DOMAIN/auth/realms/pwa/broker/facebook/endpoint`
+
+**Known quirk**: If the realm already exists in the DB, Keycloak silently skips re-import.
+To apply realm changes to an existing instance: use `kcadm.sh update realms/pwa -s key=value` or wipe the postgres volume.
+
+**FTL gotcha**: Keycloak 26 FreeMarker templates use auto-escaping — `?html` is not allowed. Write plain `${}` expressions.
 
 ---
 

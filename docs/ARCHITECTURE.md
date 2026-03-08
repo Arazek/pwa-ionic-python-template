@@ -176,9 +176,10 @@ Keycloak Realm pre-configured with:
 
 **Custom login theme** (`infra/keycloak/themes/pwa/login/`):
 - `template.ftl` — base layout macro (Source Sans 3 font, brand card wrapper)
-- `login.ftl`, `error.ftl`, `info.ftl`, `login-reset-password.ftl`, `login-update-password.ftl`, `login-verify-email.ftl`
+- `login.ftl`, `error.ftl`, `info.ftl`, `login-reset-password.ftl`, `login-update-password.ftl`, `login-verify-email.ftl`, `login-update-profile.ftl`
 - `resources/css/login.css` — BEM-styled, dark mode via `@media (prefers-color-scheme: dark)`
 - **Important**: Keycloak 26 FreeMarker uses auto-escaping — `?html` is forbidden in templates. Use plain `${}` expressions.
+- **Important**: Every Keycloak required-action flow needs its own FTL. Missing `login-update-profile.ftl` causes a 500 error after first social login (Keycloak triggers "Update Profile" required action by default).
 
 **Realm import quirk**: On fresh DB, Keycloak imports `realm-export.json` automatically. If the realm already exists, import is silently skipped. To force-apply changes to an existing realm use `kcadm.sh` or delete the realm volume.
 
@@ -295,6 +296,12 @@ KEYCLOAK_DB_PASSWORD=changeme
 KEYCLOAK_ADMIN=admin
 KEYCLOAK_ADMIN_PASSWORD=changeme
 
+# Keycloak URLs
+# KEYCLOAK_INTERNAL_URL — used by backend to fetch JWKS (container-to-container, no TLS overhead)
+KEYCLOAK_INTERNAL_URL=http://keycloak:8080
+# KEYCLOAK_PUBLIC_URL — must match the `iss` claim in tokens (the URL the browser uses to reach Keycloak)
+KEYCLOAK_PUBLIC_URL=https://localhost:4443/auth
+
 # Keycloak Social IdPs
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
@@ -314,6 +321,11 @@ TLS_MODE=local
 ACME_EMAIL=your@email.com
 DOMAIN=localhost
 ```
+
+> **Keycloak issuer note**: The JWT `iss` claim is set by Keycloak to the public URL the browser accessed
+> (e.g. `https://localhost:4443/auth/realms/pwa`). The backend must use `KEYCLOAK_PUBLIC_URL` for issuer
+> verification, not `KEYCLOAK_INTERNAL_URL`. The JWKS endpoint can still use the internal URL for
+> efficiency. Both are configured in `backend/app/core/config.py`.
 
 ---
 

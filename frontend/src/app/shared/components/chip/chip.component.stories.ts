@@ -27,7 +27,7 @@ export const SelectedAndRemovable: Story = { args: { variant: 'default', selecte
 export const Variants: Story = {
   render: () => ({
     template: `
-      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:16px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:16px;background:var(--ion-background-color,#f4f5f8);border-radius:8px">
         <app-chip variant="default">Default</app-chip>
         <app-chip variant="info">Info</app-chip>
         <app-chip variant="success">Success</app-chip>
@@ -41,7 +41,7 @@ export const Variants: Story = {
 export const Group: Story = {
   render: () => ({
     template: `
-      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:16px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:16px;background:var(--ion-background-color,#f4f5f8);border-radius:8px">
         <app-chip [selected]="true">Design</app-chip>
         <app-chip>Development</app-chip>
         <app-chip [removable]="true">Marketing</app-chip>

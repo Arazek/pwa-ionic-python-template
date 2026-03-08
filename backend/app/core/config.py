@@ -23,6 +23,7 @@ class Settings(BaseSettings):
 
     # Keycloak
     KEYCLOAK_INTERNAL_URL: str = "http://keycloak:8080"
+    KEYCLOAK_PUBLIC_URL: str = "https://localhost:4443/auth"
     KEYCLOAK_REALM: str = "pwa"
 
     @property
@@ -34,9 +35,8 @@ class Settings(BaseSettings):
 
     @property
     def KEYCLOAK_ISSUER(self) -> str:
-        return (
-            f"{self.KEYCLOAK_INTERNAL_URL}/auth/realms/{self.KEYCLOAK_REALM}"
-        )
+        # Must match the `iss` claim in tokens, which uses the public URL
+        return f"{self.KEYCLOAK_PUBLIC_URL}/realms/{self.KEYCLOAK_REALM}"
 
     # Security
     SECRET_KEY: str

@@ -195,3 +195,17 @@ Full rules in `docs/CONVENTIONS.md`. Key points:
 
 **If the user asks you to violate a convention, flag it and ask for double confirmation before proceeding.**
 
+---
+
+## Known gotchas (check before debugging)
+
+| Symptom | Root cause | Fix |
+|---------|-----------|-----|
+| Navigating to any tab redirects to home | `tabs.page.ts` missing `<ion-router-outlet />` inside `<ion-tabs>` | Add `IonRouterOutlet` to imports + template |
+| All API calls return 401 | Keycloak JWT `iss` uses public URL; backend verifies against internal URL | Set `KEYCLOAK_PUBLIC_URL` in `.env`; `config.py` uses it for `KEYCLOAK_ISSUER` |
+| "Sorry internal server error" after social login | Custom Keycloak theme missing `login-update-profile.ftl` | Create the FTL using `@layout.page` macro |
+| `::part()` in component SCSS has no effect | Angular emulated encapsulation breaks `::part()` selectors | Move `::part()` rules to `src/global.scss` |
+| Redirect loop on login | Auth guards using `router.navigate() + return false` | Return `router.createUrlTree([...])` from guards |
+| Ionic components have no styling / differ from Storybook | `provideIonicAngular()` missing from `app.config.ts` | Add `provideIonicAngular()` to providers |
+| Card variants are transparent in dark mode | `background: rgba(tint)` replaces card surface color | Use CSS multiple backgrounds to layer tint over `--ion-card-background` |
+

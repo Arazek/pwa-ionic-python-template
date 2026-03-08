@@ -12,6 +12,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return from(keycloak.getToken()).pipe(
     switchMap((token) => {
+      console.log('[authInterceptor] url:', req.url, '| token present:', !!token, '| token prefix:', token ? token.substring(0, 20) + '...' : 'NONE');
       const authReq = token
         ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
         : req;

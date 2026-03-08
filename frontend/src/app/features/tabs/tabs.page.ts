@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {
-  IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel,
+  IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { home, list, settingsOutline } from 'ionicons/icons';
@@ -8,9 +8,10 @@ import { home, list, settingsOutline } from 'ionicons/icons';
 @Component({
   selector: 'app-tabs',
   standalone: true,
-  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel],
+  imports: [IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet],
   template: `
     <ion-tabs>
+      <ion-router-outlet />
       <ion-tab-bar slot="bottom">
         <ion-tab-button tab="home" href="/tabs/home">
           <ion-icon name="home" />

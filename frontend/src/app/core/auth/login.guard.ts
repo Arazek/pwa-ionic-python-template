@@ -8,9 +8,6 @@ export const loginGuard: CanActivateFn = async () => {
   const router = inject(Router);
 
   const authenticated = await keycloak.isLoggedIn();
-  if (authenticated) {
-    await router.navigate(['/tabs/home']);
-    return false;
-  }
-  return true;
+  console.log('[loginGuard] authenticated:', authenticated);
+  return !authenticated || router.createUrlTree(['/tabs/home']);
 };

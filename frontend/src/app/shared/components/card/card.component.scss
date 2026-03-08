@@ -11,22 +11,30 @@
 
   &--info {
     border-left: 3px solid var(--ion-color-primary);
-    background: rgba(var(--ion-color-primary-rgb), 0.04);
+    background:
+      rgba(var(--ion-color-primary-rgb), 0.06),
+      var(--ion-card-background, var(--ion-item-background, #fff));
   }
 
   &--success {
     border-left: 3px solid var(--ion-color-success);
-    background: rgba(var(--ion-color-success-rgb), 0.04);
+    background:
+      rgba(var(--ion-color-success-rgb), 0.06),
+      var(--ion-card-background, var(--ion-item-background, #fff));
   }
 
   &--warning {
     border-left: 3px solid var(--ion-color-warning);
-    background: rgba(var(--ion-color-warning-rgb), 0.06);
+    background:
+      rgba(var(--ion-color-warning-rgb), 0.08),
+      var(--ion-card-background, var(--ion-item-background, #fff));
   }
 
   &--danger {
     border-left: 3px solid var(--ion-color-danger);
-    background: rgba(var(--ion-color-danger-rgb), 0.04);
+    background:
+      rgba(var(--ion-color-danger-rgb), 0.06),
+      var(--ion-card-background, var(--ion-item-background, #fff));
   }
 
   &--clickable {

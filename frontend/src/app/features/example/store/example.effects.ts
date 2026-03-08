@@ -14,14 +14,19 @@ export class ExampleEffects {
   loadItems$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ExampleActions.loadItems),
-      switchMap(() =>
-        this.api.getAll().pipe(
-          map((items) => ExampleActions.loadItemsSuccess({ items })),
-          catchError((error) =>
-            of(ExampleActions.loadItemsFailure({ error: error.message })),
-          ),
-        ),
-      ),
+      switchMap(() => {
+        console.log('[ExampleEffects] loadItems dispatched');
+        return this.api.getAll().pipe(
+          map((items) => {
+            console.log('[ExampleEffects] loadItems success, count:', items.length);
+            return ExampleActions.loadItemsSuccess({ items });
+          }),
+          catchError((error) => {
+            console.error('[ExampleEffects] loadItems failure:', error.status, error.message);
+            return of(ExampleActions.loadItemsFailure({ error: error.message }));
+          }),
+        );
+      }),
     ),
   );
 

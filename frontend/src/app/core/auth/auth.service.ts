@@ -19,7 +19,7 @@ export class AuthService {
   }
 
   login(): Promise<void> {
-    return this.keycloak.login();
+    return this.keycloak.login({ redirectUri: window.location.origin });
   }
 
   logout(): Promise<void> {

@@ -1,11 +1,10 @@
 import { Component, Input } from '@angular/core';
-import { NgFor } from '@angular/common';
 import { IonSkeletonText, IonAvatar, IonItem, IonLabel } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-loading-skeleton',
   standalone: true,
-  imports: [NgFor, IonSkeletonText, IonAvatar, IonItem, IonLabel],
+  imports: [IonSkeletonText, IonAvatar, IonItem, IonLabel],
   styleUrl: './loading-skeleton.component.scss',
   template: `
     <div class="loading-skeleton">

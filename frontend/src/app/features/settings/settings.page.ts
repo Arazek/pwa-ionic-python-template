@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import {
-  IonContent, IonList, IonItem, IonLabel, IonNote,
+  IonContent, IonList, IonItem, IonLabel,
   IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -27,7 +27,7 @@ const ACCENT_OPTIONS: AccentOption[] = [
   selector: 'app-settings',
   standalone: true,
   imports: [
-    IonContent, IonList, IonItem, IonLabel, IonNote,
+    IonContent, IonList, IonItem, IonLabel,
     IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
     PageHeaderComponent, SectionComponent, DividerComponent, AvatarComponent,
   ],

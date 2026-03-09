@@ -29,6 +29,7 @@ frontend/www/
 
 # Local scripts / ad-hoc tooling (not part of the project)
 capture_stories.js
+/package.json
 
 # Capacitor native projects (generated, not committed unless needed)
 frontend/android/

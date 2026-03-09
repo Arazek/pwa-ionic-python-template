@@ -70,7 +70,7 @@ pwa-template/
 │   │   │   │       │   ├── example.selectors.ts
 │   │   │   │       │   └── example.state.ts
 │   │   │   │       └── example.routes.ts
-│   │   │   ├── shared/              # Shared components, pipes, directives (22 components)
+│   │   │   ├── shared/              # Shared components, pipes, directives (27 components)
 │   │   │   │   └── index.ts         # Barrel — re-exports all shared components/types
 │   │   │   ├── store/               # Root NgRx store registration
 │   │   │   │   └── app.state.ts
@@ -240,17 +240,18 @@ The `SettingsPage` exposes the full picker UI (scheme segment + 5 accent swatche
 
 ### Shared Component Library
 
-22 standalone components in `shared/components/`, all barrel-exported from `shared/index.ts`.
+27 standalone components in `shared/components/`, all barrel-exported from `shared/index.ts`.
 Every component has a co-located `.stories.ts` (Storybook) and `.scss` (BEM-styled).
 
-| Category   | Components |
-|------------|------------|
-| Layout     | Card, Section, Divider, PageHeader, ListItem |
-| Identity   | Avatar, Badge, Logo |
-| Forms      | FormField, SelectField, TextareaField, ToggleField, SearchBar |
-| Feedback   | InlineAlert, ErrorState, SuccessState, EmptyState, LoadingSkeleton |
-| Media      | ImageWithFallback |
-| Auth       | SocialLoginButton, Chip, ChipList |
+| Category        | Components |
+|-----------------|------------|
+| Layout          | Card, Section, Divider, PageHeader, ListItem |
+| Identity        | Avatar, Badge, Logo |
+| Forms           | FormField, SelectField, TextareaField, ToggleField, SearchBar |
+| Feedback        | InlineAlert, ErrorState, SuccessState, EmptyState, LoadingSkeleton |
+| Media           | ImageWithFallback |
+| Auth            | SocialLoginButton, Chip, ChipList |
+| Admin Dashboard | StatCard, DataTable, ActionMenu, Drawer, Sidebar |
 
 ### NgRx Store Layout
 ```
@@ -310,7 +311,7 @@ FACEBOOK_CLIENT_SECRET=
 
 # Backend
 SECRET_KEY=changeme
-BACKEND_CORS_ORIGINS=["https://localhost"]
+BACKEND_CORS_ORIGINS=["https://localhost", "https://localhost:4443"]
 
 # pgAdmin
 PGADMIN_EMAIL=admin@local.dev
@@ -382,7 +383,7 @@ Storybook is set up in `frontend/` for developing and documenting shared UI comp
 - **Autodocs**: enabled — stories tagged with `autodocs` get an auto-generated docs page
 - **Theme toggle**: Light/Dark switcher in toolbar — sets `body.dark` class via `withTheme` decorator in `preview.ts`
 - **Font**: Source Sans 3 injected via `preview-head.html` (NOT imported in `preview.ts` — Angular builder handles global styles via `styles` array)
-- **Coverage**: 88 stories across all 22 shared components
+- **Coverage**: stories across all 27 shared components
 
 ### Story locations
 

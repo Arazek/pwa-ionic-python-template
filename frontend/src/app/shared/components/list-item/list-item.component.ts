@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { NgClass } from '@angular/common';
-import { IonItem, IonLabel, IonIcon, IonNote } from '@ionic/angular/standalone';
+import { IonItem, IonLabel, IonNote } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronForwardOutline } from 'ionicons/icons';
 import { AvatarComponent } from '../avatar/avatar.component';
@@ -8,7 +7,7 @@ import { AvatarComponent } from '../avatar/avatar.component';
 @Component({
   selector: 'app-list-item',
   standalone: true,
-  imports: [NgClass, IonItem, IonLabel, IonIcon, IonNote, AvatarComponent],
+  imports: [IonItem, IonLabel, IonNote, AvatarComponent],
   styleUrl: './list-item.component.scss',
   template: `
     <ion-item

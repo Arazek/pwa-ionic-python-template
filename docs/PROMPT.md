@@ -124,13 +124,22 @@ Entry point: `src/main.ts` → `app.config.ts` (providers: router, store, Keyclo
 
 ## Shared components
 
-All 22 components are in `shared/components/` and exported from `shared/index.ts`. Import from there:
+All 27 components are in `shared/components/` and exported from `shared/index.ts`. Import from there:
 
 ```ts
-import { AvatarComponent, CardComponent, SectionComponent } from '../../shared';
+import { AvatarComponent, CardComponent, StatCardComponent } from '../../shared';
 ```
 
 Storybook at `http://localhost:6006` — run via `./run.sh storybook`.
+
+### Admin dashboard components (added)
+| Component | Description |
+|-----------|-------------|
+| `StatCard` | Metric tile — icon, value, label, trend badge (▲/▼ %). 4 color variants. |
+| `DataTable` | Sortable table — `#actionsTemplate` ng-template per row, loading/empty states |
+| `ActionMenu` | IonPopover dropdown — `ng-content` trigger, color-coded action items |
+| `Drawer` | Slide-from-right panel — `slot="footer"` projection, backdrop dismiss |
+| `Sidebar` | Collapsible nav — icon-only mode, nested items, dot/count badges |
 
 ---
 

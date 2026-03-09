@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { NgClass } from '@angular/common';
-import { IonInput, IonLabel } from '@ionic/angular/standalone';
+import { IonInput } from '@ionic/angular/standalone';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-form-field',
   standalone: true,
-  imports: [NgClass, IonInput, IonLabel, ReactiveFormsModule],
+  imports: [NgClass, IonInput, ReactiveFormsModule],
   styleUrl: './form-field.component.scss',
   template: `
     <div class="form-field" [ngClass]="{ 'form-field--error': hasError }">

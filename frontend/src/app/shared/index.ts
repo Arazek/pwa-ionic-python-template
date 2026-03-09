@@ -1,3 +1,10 @@
+// ─── Admin Dashboard ──────────────────────────────────────────────────────────
+export { StatCardComponent, StatCardColor } from './components/stat-card/stat-card.component';
+export { DataTableComponent, DataTableColumn, DataTableSortEvent } from './components/data-table/data-table.component';
+export { ActionMenuComponent, ActionMenuItem } from './components/action-menu/action-menu.component';
+export { DrawerComponent } from './components/drawer/drawer.component';
+export { SidebarComponent, SidebarItem } from './components/sidebar/sidebar.component';
+
 // ─── Feedback & State ─────────────────────────────────────────────────────────
 export { EmptyStateComponent, EmptyStateVariant } from './components/empty-state/empty-state.component';
 export { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component';

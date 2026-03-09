@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { NgFor, NgClass } from '@angular/common';
-import { IonSelect, IonSelectOption, IonLabel } from '@ionic/angular/standalone';
+import { NgClass } from '@angular/common';
+import { IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 
 export interface SelectOption<T = string> {
@@ -11,7 +11,7 @@ export interface SelectOption<T = string> {
 @Component({
   selector: 'app-select-field',
   standalone: true,
-  imports: [NgFor, NgClass, IonSelect, IonSelectOption, IonLabel, ReactiveFormsModule],
+  imports: [NgClass, IonSelect, IonSelectOption, ReactiveFormsModule],
   styleUrl: './select-field.component.scss',
   template: `
     <div class="select-field" [ngClass]="{ 'select-field--error': hasError }">

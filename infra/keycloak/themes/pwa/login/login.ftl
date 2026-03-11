@@ -29,12 +29,7 @@
 
     <#-- Password field -->
     <div class="auth-field">
-      <div class="auth-field__label-row">
-        <label class="auth-field__label" for="password">${msg("password")}</label>
-        <#if realm.resetPasswordAllowed>
-          <a href="${url.loginResetCredentialsUrl}" class="auth-link">${msg("doForgotPassword")}</a>
-        </#if>
-      </div>
+      <label class="auth-field__label" for="password">${msg("password")}</label>
       <input
         class="auth-field__input"
         id="password"
@@ -44,6 +39,11 @@
         <#if usernameHidden??>autofocus</#if>
       >
     </div>
+
+    <#-- Forgot password link (below password, after tab order) -->
+    <#if realm.resetPasswordAllowed>
+      <a href="${url.loginResetCredentialsUrl}" class="auth-link auth-link--forgot">${msg("doForgotPassword")}</a>
+    </#if>
 
     <#-- Remember me -->
     <#if realm.rememberMe && !usernameHidden??>

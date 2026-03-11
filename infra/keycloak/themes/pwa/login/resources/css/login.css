@@ -186,12 +186,6 @@
   gap: 6px;
 }
 
-.auth-field__label-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .auth-field__label {
   font-size: 13px;
   font-weight: 500;
@@ -305,6 +299,12 @@
 .auth-link--bold {
   font-weight: 600;
   font-size: inherit;
+}
+
+.auth-link--forgot {
+  display: block;
+  text-align: right;
+  margin-top: -6px;
 }
 
 /* ─── Divider ────────────────────────────────────────────────────────────────── */

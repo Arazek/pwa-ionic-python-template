@@ -1,3 +1,5 @@
+@use 'theme/variables' as v;
+
 .settings-content {
   --background: var(--ion-background-color);
 }
@@ -67,8 +69,12 @@
 
 .settings-segment {
   --background: var(--ion-color-light);
-  width: 180px;
-  min-width: 180px;
+  width: 100%;
+
+  @include v.tablet-up {
+    width: 180px;
+    min-width: 180px;
+  }
 
   ion-segment-button {
     --padding-top: 6px;

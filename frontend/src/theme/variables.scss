@@ -287,3 +287,20 @@ body:not(.light):not(.dark) {
     @include dark-accent-overrides;
   }
 }
+
+// ─── Responsive breakpoints ───────────────────────────────────────────────────
+$bp-mobile-max:  767px;
+$bp-tablet-min:  768px;
+$bp-desktop-min: 1024px;
+
+@mixin mobile {
+  @media (max-width: #{$bp-mobile-max}) { @content; }
+}
+
+@mixin tablet-up {
+  @media (min-width: #{$bp-tablet-min}) { @content; }
+}
+
+@mixin desktop-up {
+  @media (min-width: #{$bp-desktop-min}) { @content; }
+}

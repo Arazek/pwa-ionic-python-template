@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
 
     # CORS
-    BACKEND_CORS_ORIGINS: List[str] = ["https://localhost"]
+    BACKEND_CORS_ORIGINS: List[str] = ["https://localhost", "https://localhost:4443"]
 
     # Logging
     LOG_LEVEL: str = "info"

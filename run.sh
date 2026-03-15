@@ -27,6 +27,14 @@ require_tool() {
   command -v "$1" &>/dev/null || error "$1 is required but not installed."
 }
 
+# Use sudo for docker if the current user lacks permission
+if docker info &>/dev/null 2>&1; then
+  DOCKER="docker"
+else
+  warn "Docker requires sudo — prompting for password..."
+  DOCKER="sudo docker"
+fi
+
 # ---------------------------------------------------------------------------
 # TLS — generate self-signed cert for local dev
 # ---------------------------------------------------------------------------
@@ -53,9 +61,10 @@ cmd_certs() {
 cmd_dev() {
   require_env
   require_tool docker
+  $DOCKER info &>/dev/null || error "Docker daemon is not running. Start it with: sudo systemctl start docker"
   [ ! -f infra/traefik/certs/local.crt ] && cmd_certs
   info "Starting services in dev mode..."
-  docker compose ${COMPOSE_LOCAL} up --build "$@"
+  $DOCKER compose ${COMPOSE_LOCAL} up --build "$@"
 }
 
 # ---------------------------------------------------------------------------
@@ -64,8 +73,9 @@ cmd_dev() {
 cmd_prod() {
   require_env
   require_tool docker
+  $DOCKER info &>/dev/null || error "Docker daemon is not running. Start it with: sudo systemctl start docker"
   info "Starting services in prod mode..."
-  docker compose ${COMPOSE_PROD} up -d --build "$@"
+  $DOCKER compose ${COMPOSE_PROD} up -d --build "$@"
   success "Services started. Run './run.sh logs' to follow output."
 }
 
@@ -74,7 +84,7 @@ cmd_prod() {
 # ---------------------------------------------------------------------------
 cmd_stop() {
   info "Stopping all services..."
-  docker compose ${COMPOSE_BASE} down "$@"
+  $DOCKER compose ${COMPOSE_BASE} down "$@"
 }
 
 # ---------------------------------------------------------------------------
@@ -90,7 +100,7 @@ cmd_restart() {
 # ---------------------------------------------------------------------------
 cmd_logs() {
   local svc="${1:-}"
-  docker compose ${COMPOSE_BASE} logs -f ${svc}
+  $DOCKER compose ${COMPOSE_BASE} logs -f ${svc}
 }
 
 # ---------------------------------------------------------------------------
@@ -98,7 +108,7 @@ cmd_logs() {
 # ---------------------------------------------------------------------------
 cmd_build() {
   require_env
-  docker compose ${COMPOSE_BASE} build "$@"
+  $DOCKER compose ${COMPOSE_BASE} build "$@"
 }
 
 # ---------------------------------------------------------------------------
@@ -107,7 +117,7 @@ cmd_build() {
 cmd_db_migrate() {
   require_env
   info "Running Alembic migrations..."
-  docker compose ${COMPOSE_LOCAL} run --rm backend alembic upgrade head
+  $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic upgrade head
   success "Migrations applied."
 }
 
@@ -119,7 +129,7 @@ cmd_db_revision() {
   [ -z "$msg" ] && error "Usage: ./run.sh db:revision \"your message\""
   require_env
   info "Creating Alembic revision: ${msg}"
-  docker compose ${COMPOSE_LOCAL} run --rm backend alembic revision --autogenerate -m "${msg}"
+  $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic revision --autogenerate -m "${msg}"
 }
 
 # ---------------------------------------------------------------------------
@@ -131,8 +141,8 @@ cmd_db_reset() {
   [ "$confirm" != "yes" ] && { info "Aborted."; exit 0; }
   require_env
   info "Resetting app database..."
-  docker compose ${COMPOSE_LOCAL} run --rm backend alembic downgrade base
-  docker compose ${COMPOSE_LOCAL} run --rm backend alembic upgrade head
+  $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic downgrade base
+  $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic upgrade head
   success "Database reset."
 }
 
@@ -155,7 +165,7 @@ cmd_frontend_sync() {
 cmd_storybook() {
   require_env
   info "Starting Storybook at http://localhost:6006 ..."
-  docker compose ${COMPOSE_LOCAL} up --build storybook
+  $DOCKER compose ${COMPOSE_LOCAL} up --build storybook
 }
 
 # ---------------------------------------------------------------------------
@@ -167,25 +177,25 @@ cmd_keycloak_user() {
   local email="${3:-${username}@example.com}"
   require_env
   info "Creating Keycloak dev user '${username}' in realm 'pwa'..."
-  docker compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh config credentials \
       --server http://localhost:8080/auth \
       --realm master \
       --user "${KEYCLOAK_ADMIN:-admin}" \
       --password "${KEYCLOAK_ADMIN_PASSWORD:-devpassword123}"
-  docker compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh create users \
       -r pwa \
       -s username="${username}" \
       -s email="${email}" \
       -s enabled=true
-  docker compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh set-password \
       -r pwa \
       --username "${username}" \
       --new-password "${password}" \
       --temporary=false
-  docker compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh add-roles \
       -r pwa \
       --uusername "${username}" \
@@ -199,12 +209,12 @@ cmd_keycloak_user() {
 cmd_keycloak_export() {
   require_env
   info "Exporting Keycloak realm 'pwa'..."
-  docker compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
     /opt/keycloak/bin/kc.sh export \
     --realm pwa \
     --file /tmp/realm-export.json \
     --users realm_file
-  docker compose ${COMPOSE_BASE} cp keycloak:/tmp/realm-export.json ./infra/keycloak/realm-export.json
+  $DOCKER compose ${COMPOSE_BASE} cp keycloak:/tmp/realm-export.json ./infra/keycloak/realm-export.json
   success "Realm exported to infra/keycloak/realm-export.json"
 }
 
@@ -213,7 +223,7 @@ cmd_keycloak_export() {
 # ---------------------------------------------------------------------------
 cmd_shell() {
   local svc="${1:-backend}"
-  docker compose ${COMPOSE_LOCAL} exec "${svc}" /bin/bash
+  $DOCKER compose ${COMPOSE_LOCAL} exec "${svc}" /bin/bash
 }
 
 # ---------------------------------------------------------------------------

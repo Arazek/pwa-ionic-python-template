@@ -28,6 +28,9 @@
               }
             ],
             "styles": ["src/theme/variables.scss", "src/global.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src"]
+            },
             "scripts": [],
             "serviceWorker": "ngsw-config.json"
           },

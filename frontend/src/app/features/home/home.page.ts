@@ -3,19 +3,15 @@ import { IonContent } from '@ionic/angular/standalone';
 import { KeycloakProfile } from 'keycloak-js';
 
 import { AuthService } from '../../core/auth/auth.service';
-import {
-  PageHeaderComponent, SectionComponent, CardComponent, AvatarComponent,
-} from '../../shared';
+import { PageHeaderComponent, SectionComponent, CardComponent } from '../../shared';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [IonContent, PageHeaderComponent, SectionComponent, CardComponent, AvatarComponent],
+  imports: [IonContent, PageHeaderComponent, SectionComponent, CardComponent],
   styleUrl: './home.page.scss',
   template: `
-    <app-page-header title="Home">
-      <app-avatar slot="end" [name]="fullName" size="sm" style="margin-right: 12px;" />
-    </app-page-header>
+    <app-page-header title="Home" />
 
     <ion-content class="home-content">
 

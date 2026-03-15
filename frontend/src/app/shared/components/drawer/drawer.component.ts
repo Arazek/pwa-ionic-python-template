@@ -18,6 +18,7 @@ import { closeOutline } from 'ionicons/icons';
     <div
       class="drawer"
       [class.drawer--open]="open"
+      [class.drawer--left]="position === 'left'"
       [style.width]="width"
       role="dialog"
       [attr.aria-modal]="open"
@@ -44,6 +45,7 @@ export class DrawerComponent {
   @Input() open = false;
   @Input() title = '';
   @Input() width = '400px';
+  @Input() position: 'left' | 'right' = 'right';
   @Output() closed = new EventEmitter<void>();
 
   constructor() {

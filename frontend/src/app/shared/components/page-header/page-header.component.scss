@@ -17,4 +17,19 @@
   ion-back-button {
     --color: var(--ion-color-primary);
   }
+
+  &__avatar-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 8px 0 4px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    transition: opacity 0.15s;
+
+    &:hover { opacity: 0.8; }
+    &:active { opacity: 0.6; }
+  }
 }

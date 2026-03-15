@@ -1,3 +1,5 @@
+@use 'theme/variables' as v;
+
 .data-table {
   width: 100%;
   background: var(--ion-card-background, var(--ion-item-background, #fff));
@@ -5,14 +7,28 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
   overflow: hidden;
 
+  @include v.mobile {
+    border-radius: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
   &__scroll {
     overflow-x: auto;
+
+    @include v.mobile {
+      overflow-x: unset;
+    }
   }
 
   &__table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+
+    @include v.mobile {
+      display: block;
+    }
   }
 
   &__th {
@@ -44,6 +60,10 @@
       width: 1px;
       padding: 12px 8px;
     }
+
+    @include v.mobile {
+      display: none;
+    }
   }
 
   &__th-inner {
@@ -73,6 +93,19 @@
     &:hover {
       background: rgba(var(--ion-color-medium-rgb), 0.04);
     }
+
+    @include v.mobile {
+      display: block;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      background: var(--ion-card-background, #fff);
+      border-bottom: none;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 
   &__td {
@@ -87,6 +120,39 @@
       padding: 8px;
       text-align: right;
       white-space: nowrap;
+    }
+
+    @include v.mobile {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(var(--ion-color-medium-rgb), 0.08);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &::before {
+        content: attr(data-label);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ion-color-medium);
+        flex-shrink: 0;
+        margin-right: 12px;
+        padding-top: 1px;
+      }
+
+      &--actions {
+        justify-content: flex-end;
+        padding: 8px 16px;
+
+        &::before {
+          display: none;
+        }
+      }
     }
   }
 }

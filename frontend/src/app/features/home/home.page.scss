@@ -1,3 +1,5 @@
+@use 'theme/variables' as v;
+
 .home-content {
   --background: var(--ion-background-color);
 }
@@ -25,6 +27,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   padding: 0 16px;
+
+  @include v.mobile {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 }
 
 .home-card {

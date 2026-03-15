@@ -34,3 +34,14 @@ ion-router-outlet:not([tabs]) {
   justify-content: space-between;
   width: 100%;
 }
+
+// ─── Responsive form grid utility ────────────────────────────────────────────
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+  }
+}

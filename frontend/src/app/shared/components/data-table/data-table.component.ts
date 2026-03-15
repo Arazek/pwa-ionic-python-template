@@ -71,6 +71,7 @@ export interface DataTableSortEvent {
                     <td
                       class="data-table__td"
                       [ngClass]="'data-table__td--' + (col.align ?? 'left')"
+                      [attr.data-label]="col.label"
                     >
                       {{ getCellValue(row, col) }}
                     </td>

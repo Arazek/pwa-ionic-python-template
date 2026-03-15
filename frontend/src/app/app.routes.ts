@@ -36,6 +36,11 @@ export const routes: Routes = [
           import('./features/settings/settings.routes').then((m) => m.settingsRoutes),
       },
       {
+        path: 'profile',
+        loadChildren: () =>
+          import('./features/profile/profile.routes').then((m) => m.profileRoutes),
+      },
+      {
         path: '',
         redirectTo: 'home',
         pathMatch: 'full',

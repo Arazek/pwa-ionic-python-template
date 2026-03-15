@@ -32,6 +32,17 @@
     transform: translateX(0);
   }
 
+  &--left {
+    left: 0;
+    right: auto;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    transform: translateX(-100%);
+
+    &.drawer--open {
+      transform: translateX(0);
+    }
+  }
+
   &__header {
     display: flex;
     align-items: center;

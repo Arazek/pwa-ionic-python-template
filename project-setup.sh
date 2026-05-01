@@ -41,8 +41,12 @@ FORCE=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --name)           APP_NAME="${2:-}"; shift 2 ;;
-    --domain)         DOMAIN="${2:-}"; shift 2 ;;
+    --name)
+      [[ -z "${2:-}" ]] && error "--name requires a value."
+      APP_NAME="$2"; shift 2 ;;
+    --domain)
+      [[ -z "${2:-}" ]] && error "--domain requires a value."
+      DOMAIN="$2"; shift 2 ;;
     --non-interactive) NON_INTERACTIVE=true; shift ;;
     --force)          FORCE=true; shift ;;
     *) error "Unknown argument: $1. Usage: ./project-setup.sh [--name <name>] [--domain <domain>] [--non-interactive] [--force]" ;;
@@ -139,8 +143,8 @@ sed -i "s|^APP_NAME=.*|APP_NAME=${APP_NAME}|" .env
 sed -i "s|^DOMAIN=.*|DOMAIN=${DOMAIN}|" .env
 sed -i "s|^POSTGRES_DB=.*|POSTGRES_DB=${APP_NAME}|" .env
 sed -i "s|^KEYCLOAK_REALM=.*|KEYCLOAK_REALM=${APP_NAME}|" .env
-sed -i "s|^KEYCLOAK_PUBLIC_URL=.*|KEYCLOAK_PUBLIC_URL=https://${DOMAIN}/auth|" .env
-sed -i "s|^BACKEND_CORS_ORIGINS=.*|BACKEND_CORS_ORIGINS=[\"https://${DOMAIN}\"]|" .env
+sed -i "s|^KEYCLOAK_PUBLIC_URL=.*|KEYCLOAK_PUBLIC_URL=https://${DOMAIN}:4443/auth|" .env
+sed -i "s|^BACKEND_CORS_ORIGINS=.*|BACKEND_CORS_ORIGINS=[\"https://${DOMAIN}:4443\"]|" .env
 sed -i "s|^SECRET_KEY=.*|SECRET_KEY=${SECRET_KEY}|" .env
 
 success ".env written."
@@ -218,6 +222,11 @@ REALM_EXISTS=$($DOCKER exec pwa-infra-keycloak-1 /opt/keycloak/bin/kcadm.sh get 
 if [ "$REALM_EXISTS" -gt 0 ]; then
   warn "Realm '${APP_NAME}' already exists — skipping."
 else
+  # Verify the pwa realm exists before attempting export
+  PWA_REALM_CHECK=$($DOCKER exec pwa-infra-keycloak-1 /opt/keycloak/bin/kcadm.sh get realms \
+    --fields realm 2>/dev/null | grep -c '"pwa"' || true)
+  [ "$PWA_REALM_CHECK" -eq 0 ] && error "The 'pwa' realm does not exist in Keycloak. Ensure infra started cleanly (it imports the pwa realm on first boot)."
+
   info "Exporting 'pwa' realm as template..."
 
   # Export pwa realm using Admin REST API (online, no server restart needed)

@@ -55,18 +55,22 @@ fi
 # ---------------------------------------------------------------------------
 cmd_certs() {
   require_tool openssl
+  require_env
+  local domain
+  domain="$(grep -m1 '^DOMAIN=' .env 2>/dev/null | cut -d= -f2 || echo "localhost")"
+  domain="${domain:-localhost}"
   mkdir -p infra/traefik/certs
   if [ -f infra/traefik/certs/local.crt ]; then
     warn "Certs already exist at infra/traefik/certs/. Delete them to regenerate."
     return
   fi
-  info "Generating self-signed certificate for localhost..."
+  info "Generating self-signed certificate for ${domain}..."
   openssl req -x509 -newkey rsa:4096 -nodes \
     -keyout infra/traefik/certs/local.key \
     -out infra/traefik/certs/local.crt \
     -days 365 \
-    -subj "/CN=localhost" \
-    -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+    -subj "/CN=${domain}" \
+    -addext "subjectAltName=DNS:${domain},DNS:*.${domain},DNS:localhost,IP:127.0.0.1" 2>/dev/null
   success "Certificates generated."
 }
 
@@ -221,6 +225,7 @@ cmd_frontend_sync() {
 # ---------------------------------------------------------------------------
 cmd_storybook() {
   require_env
+  ensure_infra
   info "Starting Storybook at http://localhost:6006 ..."
   $DOCKER compose ${COMPOSE_LOCAL} up --build storybook
 }

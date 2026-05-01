@@ -10,18 +10,19 @@ Production-ready out of the box: authentication, database, API, reverse proxy, T
 1. [Tech Stack](#tech-stack)
 2. [Prerequisites](#prerequisites)
 3. [Quick Start](#quick-start)
-4. [Services & URLs](#services--urls)
-5. [Project Structure](#project-structure)
-6. [Authentication](#authentication)
-7. [Backend API](#backend-api)
-8. [Frontend](#frontend)
-9. [Shared Component Library](#shared-component-library)
-10. [Storybook](#storybook)
-11. [Database & Migrations](#database--migrations)
-12. [Environment Variables](#environment-variables)
-13. [run.sh Command Reference](#runsh-command-reference)
-14. [Native Builds (Capacitor)](#native-builds-capacitor)
-15. [Production Deployment](#production-deployment)
+4. [Multi-Project Workflow](#multi-project-workflow)
+5. [Services & URLs](#services--urls)
+6. [Project Structure](#project-structure)
+7. [Authentication](#authentication)
+8. [Backend API](#backend-api)
+9. [Frontend](#frontend)
+10. [Shared Component Library](#shared-component-library)
+11. [Storybook](#storybook)
+12. [Database & Migrations](#database--migrations)
+13. [Environment Variables](#environment-variables)
+14. [run.sh Command Reference](#runsh-command-reference)
+15. [Native Builds (Capacitor)](#native-builds-capacitor)
+16. [Production Deployment](#production-deployment)
 
 ---
 
@@ -76,6 +77,68 @@ On the first run, `run.sh dev` will:
 **TLS browser warning on first access:**
 - Chrome: type `thisisunsafe` anywhere on the warning page
 - Firefox: click *Advanced* → *Accept the Risk and Continue*
+
+---
+
+## Multi-Project Workflow
+
+This template is designed so one set of shared infrastructure (Traefik, Keycloak, PostgreSQL, pgAdmin) serves multiple projects on the same machine. Each project runs its own frontend and backend and gets its own subdomain, Postgres database, and Keycloak realm.
+
+### How projects are identified
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `APP_NAME` | Unique Traefik router prefix — must differ across projects | `myapp` |
+| `DOMAIN` | Subdomain for this project | `myapp.localhost` |
+| `POSTGRES_DB` | Dedicated database on the shared Postgres | `myapp` |
+| `KEYCLOAK_REALM` | Dedicated realm on the shared Keycloak | `myapp` |
+
+`*.localhost` resolves automatically on most systems — no `/etc/hosts` changes needed. If it does not resolve on your system, add `127.0.0.1 myapp.localhost` to `/etc/hosts`.
+
+### Starting a new project from this template
+
+```bash
+# 1. Copy the template
+cp -r pwa-ionic-python-template my-new-project
+cd my-new-project
+
+# 2. Bootstrap (creates .env, Postgres DB, Keycloak realm, runs migrations)
+./project-setup.sh --name my-new-project --domain my-new-project.localhost
+
+# 3. Start the app (infra starts automatically if not already running)
+./run.sh dev
+```
+
+### Infra commands
+
+```bash
+./run.sh infra:up          # Start Traefik, Keycloak, Postgres, pgAdmin (detached)
+./run.sh infra:down        # Stop shared infra
+./run.sh infra:logs        # Tail infra logs
+./run.sh infra:status      # Show running infra containers
+```
+
+### App commands
+
+```bash
+./run.sh dev               # Start frontend + backend with hot reload (auto-starts infra)
+./run.sh stop              # Stop frontend + backend only — infra keeps running
+./run.sh infra:down        # Stop infra (affects all projects on this machine)
+```
+
+### Running multiple projects simultaneously
+
+Each project has its own `.env` with a unique `APP_NAME` and `DOMAIN`. Start each project's app layer in a separate terminal:
+
+```bash
+# Terminal 1 — project A
+cd ~/projects/app-a && ./run.sh dev
+
+# Terminal 2 — project B (infra already running, starts app-b services only)
+cd ~/projects/app-b && ./run.sh dev
+```
+
+Both projects share Traefik, Keycloak, Postgres, and pgAdmin. Traefik auto-discovers each app via Docker labels and routes `app-a.localhost` and `app-b.localhost` independently.
 
 ---
 

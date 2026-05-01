@@ -3,33 +3,25 @@ import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar,
-  IonBackButton, IonButtons, IonButton,
+  IonContent, IonButton,
 } from '@ionic/angular/standalone';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectSelectedItem } from '../../store/example.selectors';
+import { PageHeaderComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-example-detail',
   standalone: true,
   imports: [
     AsyncPipe,
-    IonContent, IonHeader, IonTitle, IonToolbar,
-    IonBackButton, IonButtons, IonButton,
+    IonContent, IonButton,
+    PageHeaderComponent,
   ],
   template: `
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button defaultHref="/tabs/example" />
-        </ion-buttons>
-        <ion-title>{{ (item$ | async)?.title }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button color="danger" (click)="delete()">Delete</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
+    <app-page-header [title]="(item$ | async)?.title || 'Item Detail'" [showBack]="true" backHref="/tabs/example" [showAvatar]="false">
+      <ion-button slot="end" color="danger" (click)="delete()">Delete</ion-button>
+    </app-page-header>
 
     <ion-content class="ion-padding">
       @if (item$ | async; as item) {

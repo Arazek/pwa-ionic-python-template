@@ -9,7 +9,7 @@ services:
     ports:
       - "8090:80"    # HTTP redirect
       - "4443:443"   # HTTPS — access all projects via https://<name>.localhost:4443
-      - "8080:8080"  # Traefik dashboard
+      - "9090:8080"  # Traefik dashboard
 
   keycloak:
     environment:

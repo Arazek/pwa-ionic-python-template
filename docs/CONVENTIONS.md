@@ -223,6 +223,68 @@ getItems() { ... }
 - Unsubscribe via `async` pipe in templates (preferred), `takeUntilDestroyed()`, or `DestroyRef`.
 - Never subscribe inside a constructor — use `ngOnInit` or effects.
 
+### App Layout & Routing
+
+The `AppLayoutComponent` (`core/layout/app-layout.component.ts`) is the responsive shell for all authenticated pages:
+
+- **Desktop** (>= 768px): renders `<app-sidebar>` as a flex sibling before `<ion-tabs>`
+- **Mobile** (< 768px): hides sidebar, shows bottom `<ion-tab-bar>` inside `<ion-tabs>`
+
+Breakpoint is managed by `BreakpointService.isMobile` signal — never read `window.innerWidth` directly.
+
+**Critical rule**: `<ion-tabs>` uses `position: absolute; width: 100%; height: 100%` internally (Ionic web component behavior). The containing element (`.app-layout__main`) **must** have `position: relative`, otherwise `ion-tabs` sizes to the viewport instead of the content area, overlaying the sidebar.
+
+```scss
+// app-layout.component.scss — correct setup
+.app-layout {
+  display: flex;
+  flex: 1;
+
+  &__main {
+    flex: 1;
+    position: relative;  // ← required or sidebar is hidden behind ion-tabs
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__tabs {
+    flex: 1;
+  }
+}
+```
+
+**Routing structure**: `ion-tabs` wraps a single `<ion-router-outlet />`. Tab buttons use `href` for navigation (standard Angular routing, not Ionic tab routing). The tab bar is conditionally rendered via `@if (breakpoint.isMobile())`.
+
+**Route registration**: New features add lazy-loaded route children under `/tabs/<name>` in `app.routes.ts`. Each feature has its own `<name>.routes.ts` file. Feature routes do NOT re-declare the layout — they are children of the tabs route which is already inside `AppLayoutComponent`.
+
+### Session check (proactive auth monitoring)
+
+`SessionCheckService` (`core/auth/session-check.service.ts`) monitors the Keycloak session in the background and redirects to `/login` when the session is no longer valid (e.g. user was logged out from another tab, or the admin terminated the session).
+
+**How it works:**
+- **Periodic check**: every 60s calls `keycloak.getKeycloakInstance().updateToken(60)` to ensure the access token has at least 60s of validity left. If the token is close to expiry, it silently refreshes using the refresh token.
+- **Tab focus detection**: listens to `visibilitychange` (tab becomes visible) and `window.focus` to run an immediate check when the user returns.
+- **Failure handling**: if `updateToken` fails (refresh token invalid, session terminated), or `isLoggedIn()` returns `false`, it navigates to `/login` via `NgZone.run()`.
+
+**Wiring**: the service is instantiated via `inject(SessionCheckService)` in `AppComponent`'s constructor (same pattern as `ThemeService`). It uses `providedIn: 'root'` and is SSR-safe via `isPlatformBrowser`.
+
+**Important**: the service does NOT make a network request on every check. `updateToken(60)` only calls the Keycloak token endpoint when the current access token has less than 60s remaining. On a freshly issued token (default 5min lifespan), checks return immediately without network activity. The service detects remote logout when the token nears expiry and the refresh attempt fails.
+
+```ts
+// core/auth/session-check.service.ts — simplified logic
+private async check(): Promise<void> {
+  const loggedIn = await this.keycloak.isLoggedIn();
+  if (!loggedIn) return this.redirectToLogin();
+
+  try {
+    const instance = this.keycloak.getKeycloakInstance();
+    await instance.updateToken(60); // silent refresh if needed
+  } catch {
+    this.redirectToLogin(); // session invalid
+  }
+}
+```
+
 ### Import order
 
 Group imports in this order, separated by a blank line:

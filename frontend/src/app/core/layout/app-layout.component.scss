@@ -1,19 +1,19 @@
-:host.shell-host {
+:host {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-.shell {
+.app-layout {
   display: flex;
   flex: 1;
   overflow: hidden;
 
-  &__content {
+  &__main {
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    position: relative; // makes shell__content the containing block for ion-page absolute positioning
+    position: relative;
     display: flex;
     flex-direction: column;
   }

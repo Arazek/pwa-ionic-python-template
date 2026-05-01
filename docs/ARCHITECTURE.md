@@ -55,9 +55,10 @@ pwa-template/
 │   │   │   ├── core/                # Auth, HTTP interceptors, guards, error handling
 │   │   │   │   ├── auth/            # Keycloak service, auth guard, token interceptor, LoginPage
 │   │   │   │   ├── interceptors/    # HTTP error interceptor
+│   │   │   │   ├── layout/          # AppLayoutComponent — responsive shell (sidebar desktop / tab bar mobile)
+│   │   │   │   ├── breakpoint.service.ts  # Reactive `isMobile` signal via matchMedia
 │   │   │   │   └── theme/           # ThemeService — scheme + accent, persisted to localStorage
 │   │   │   ├── features/            # Feature slices (one folder per domain)
-│   │   │   │   ├── tabs/            # TabsPage — bottom tab navigation shell
 │   │   │   │   ├── home/            # HomePage — greeting + avatar + quick-action cards
 │   │   │   │   ├── settings/        # SettingsPage — profile, appearance picker, sign out
 │   │   │   │   └── example/         # Example feature (full NgRx pattern)
@@ -158,7 +159,10 @@ Keycloak
  │  issues access_token (JWT) + refresh_token
  ▼
 Angular stores tokens (memory + keycloak-js session)
- │
+ │  SessionCheckService monitors session in background
+ │  → every 60s checks token validity via updateToken(60)
+ │  → immediate check on tab visibilitychange / window.focus
+ │  → on failure: redirects to /login
  ▼
 FastAPI receives Bearer token on every request
  │  verifies signature via GET /auth/realms/pwa/protocol/openid-connect/certs (JWKS)
@@ -189,6 +193,7 @@ Keycloak Realm pre-configured with:
 
 - Base path: `/api/v1/`
 - Auth: Bearer JWT (verified against Keycloak JWKS, no Keycloak SDK on backend)
+- Session monitoring: `SessionCheckService` (`core/auth/session-check.service.ts`) proactively checks token validity every 60s and on tab focus, redirecting to `/login` when the session is terminated remotely
 - WebSocket: `/api/v1/ws/{channel}` — authenticated via token query param
 - All responses: JSON
 - Async throughout (asyncpg driver + SQLAlchemy async sessions)
@@ -214,13 +219,31 @@ WS   /api/v1/ws/example          → protected WebSocket
 - **Capacitor**: configured for iOS + Android native builds
 - **PWA**: `@angular/pwa` service worker, `manifest.webmanifest`, offline shell
 
+### App Layout (responsive shell)
+
+All authenticated pages are children of `AppLayoutComponent` (`core/layout/app-layout.component.ts`),
+which provides a responsive navigation shell:
+
+- **Desktop** (>= 768px): collapsible `app-sidebar` on the left with nav items (Home, Items, Settings)
+- **Mobile** (< 768px): bottom `ion-tab-bar` with the same nav items
+
+The breakpoint is managed by `BreakpointService` (`core/breakpoint.service.ts`)
+using `window.matchMedia('(max-width: 767px)')` as a reactive signal.
+
+**Critical layout rule**: The parent container (`.app-layout__main`) must have
+`position: relative` because Ionic's `<ion-tabs>` web component uses
+`position: absolute; width: 100%; height: 100%`. Without `position: relative`
+on the parent, `ion-tabs` sizes to the viewport instead of the content area,
+overlaying and hiding the sidebar. See `app-layout.component.scss`.
+
 ### Screens
 
 | Route             | Component        | Description                                          |
 |-------------------|------------------|------------------------------------------------------|
 | `/login`          | `LoginPage`      | Logo + social login buttons + "sign in with email"   |
 | `/tabs/home`      | `HomePage`       | Welcome greeting, user avatar, quick-action cards    |
-| `/tabs/settings`  | `SettingsPage`   | Profile info, theme/accent picker, sign out          |
+| `/tabs/settings`  | `SettingsPage`   | Accent/scheme picker, sign out                       |
+| `/tabs/profile`   | `ProfilePage`    | User details (name, email, username, email verified) |
 | `/tabs/example`   | `ExampleListPage`| Example CRUD feature (list + detail)                 |
 
 ### Theming System

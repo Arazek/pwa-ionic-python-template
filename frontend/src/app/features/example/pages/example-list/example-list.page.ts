@@ -3,8 +3,8 @@ import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import {
-  IonContent, IonHeader, IonTitle, IonToolbar,
-  IonList, IonItem, IonLabel, IonButton,
+  IonContent,
+  IonList, IonItem, IonLabel,
   IonFab, IonFabButton, IonIcon, IonSpinner,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -12,22 +12,20 @@ import { add } from 'ionicons/icons';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectAllItems, selectLoading } from '../../store/example.selectors';
+import { PageHeaderComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-example-list',
   standalone: true,
   imports: [
     AsyncPipe, RouterLink,
-    IonContent, IonHeader, IonTitle, IonToolbar,
+    IonContent,
     IonList, IonItem, IonLabel,
     IonFab, IonFabButton, IonIcon, IonSpinner,
+    PageHeaderComponent,
   ],
   template: `
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Items</ion-title>
-      </ion-toolbar>
-    </ion-header>
+    <app-page-header title="Items" />
 
     <ion-content>
       @if (loading$ | async) {

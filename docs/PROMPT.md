@@ -99,15 +99,17 @@ First run: browser will warn about the self-signed cert — type `thisisunsafe` 
 ```
 src/app/
 ├── core/
-│   ├── auth/            KeycloakService wrapper, authGuard, LoginPage (Logo + social buttons)
+│   ├── auth/            KeycloakService wrapper, authGuard, LoginPage, SessionCheckService
 │   ├── interceptors/    auth (token injection), error (401 → re-login)
+│   ├── layout/          AppLayoutComponent — responsive shell (sidebar desktop / tab bar mobile)
+│   ├── breakpoint.service.ts  Reactive `isMobile` signal via matchMedia('(max-width: 767px)')
 │   └── theme/           ThemeService — scheme (light/dark/system) + accent (clay/moss/dune/slate)
 ├── features/
-│   ├── tabs/            TabsPage — bottom tab navigation (Home, Items, Settings)
 │   ├── home/            HomePage — greeting, avatar in header, quick-action cards
-│   ├── settings/        SettingsPage — profile info, scheme/accent picker, sign out
+│   ├── settings/        SettingsPage — accent/scheme picker, sign out
+│   ├── profile/         ProfilePage — user details (name, email, username, email verified)
 │   └── example/         Full CRUD feature (list + detail pages, NgRx store, API service)
-├── shared/              22 standalone components, all BEM-styled + Storybook stories
+├── shared/              27 standalone components, all BEM-styled + Storybook stories
 │   └── index.ts         Barrel — import all shared components from here
 └── store/               Root NgRx registration (rootReducers, rootEffects)
 ```
@@ -217,4 +219,7 @@ Full rules in `docs/CONVENTIONS.md`. Key points:
 | Redirect loop on login | Auth guards using `router.navigate() + return false` | Return `router.createUrlTree([...])` from guards |
 | Ionic components have no styling / differ from Storybook | `provideIonicAngular()` missing from `app.config.ts` | Add `provideIonicAngular()` to providers |
 | Card variants are transparent in dark mode | `background: rgba(tint)` replaces card surface color | Use CSS multiple backgrounds to layer tint over `--ion-card-background` |
+| Sidebar invisible on desktop | `<ion-tabs>` sets `position: absolute; width: 100%; height: 100%` and sizes to viewport when parent is `position: static` | Parent container must have `position: relative` — see `app-layout.component.scss:16` |
+| Build fails after changing component template | Angular strict templates catch type mismatches (e.g. passing `showBack` as bare attribute instead of `[showBack]="true"`) | Always use property binding syntax `[input]="value"` for boolean `@Input()`s — bare attribute passes empty string `""` |
+| Session not detected as expired until next API call | `SessionCheckService` only checks every 60s or on tab focus. If you just logged out from Keycloak admin, the access token is still valid in memory until it expires (~5min) | Wait for the periodic check, or close/reopen the tab. The service detects the logout when `updateToken` tries to refresh a near-expiry token and the refresh fails. |
 

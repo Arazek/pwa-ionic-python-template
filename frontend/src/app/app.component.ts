@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 
 import { ThemeService } from './core/theme/theme.service';
+import { SessionCheckService } from './core/auth/session-check.service';
 
 @Component({
   selector: 'app-root',
@@ -12,5 +13,6 @@ import { ThemeService } from './core/theme/theme.service';
 export class AppComponent {
   constructor() {
     inject(ThemeService);
+    inject(SessionCheckService);
   }
 }

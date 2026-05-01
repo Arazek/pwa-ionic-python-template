@@ -5,7 +5,7 @@ import {
   homeOutline, peopleOutline, settingsOutline, statsChartOutline,
   documentTextOutline, cashOutline, chevronForwardOutline,
   chevronBackOutline, chevronDownOutline, menuOutline,
-  shieldOutline, notificationsOutline, helpCircleOutline,
+  shieldOutline, notificationsOutline, helpCircleOutline, listOutline,
 } from 'ionicons/icons';
 
 export interface SidebarItem {
@@ -103,7 +103,7 @@ export class SidebarComponent {
       homeOutline, peopleOutline, settingsOutline, statsChartOutline,
       documentTextOutline, cashOutline, chevronForwardOutline,
       chevronBackOutline, chevronDownOutline, menuOutline,
-      shieldOutline, notificationsOutline, helpCircleOutline,
+      shieldOutline, notificationsOutline, helpCircleOutline, listOutline,
     });
   }
 

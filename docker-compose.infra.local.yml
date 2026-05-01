@@ -1,0 +1,17 @@
+# =============================================================================
+# Local development overrides for shared infra
+# Usage: ./run.sh infra:up  (run.sh merges this automatically)
+# =============================================================================
+
+services:
+
+  traefik:
+    ports:
+      - "8090:80"    # HTTP redirect
+      - "4443:443"   # HTTPS — access all projects via https://<name>.localhost:4443
+      - "8080:8080"  # Traefik dashboard
+
+  keycloak:
+    environment:
+      KC_LOG_LEVEL: info
+      KC_HOSTNAME_STRICT: "false"

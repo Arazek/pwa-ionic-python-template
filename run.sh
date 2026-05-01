@@ -232,29 +232,30 @@ cmd_keycloak_user() {
   local username="${1:-testuser}"
   local password="${2:-testpass123}"
   local email="${3:-${username}@example.com}"
+  local realm="${KEYCLOAK_REALM:-pwa}"
   require_env
-  info "Creating Keycloak dev user '${username}' in realm 'pwa'..."
-  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
+  info "Creating Keycloak dev user '${username}' in realm '${realm}'..."
+  $DOCKER compose ${INFRA_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh config credentials \
       --server http://localhost:8080/auth \
       --realm master \
       --user "${KEYCLOAK_ADMIN:-admin}" \
       --password "${KEYCLOAK_ADMIN_PASSWORD:-devpassword123}"
-  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${INFRA_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh create users \
-      -r pwa \
+      -r "${realm}" \
       -s username="${username}" \
       -s email="${email}" \
       -s enabled=true
-  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${INFRA_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh set-password \
-      -r pwa \
+      -r "${realm}" \
       --username "${username}" \
       --new-password "${password}" \
       --temporary=false
-  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
+  $DOCKER compose ${INFRA_BASE} exec keycloak \
     /opt/keycloak/bin/kcadm.sh add-roles \
-      -r pwa \
+      -r "${realm}" \
       --uusername "${username}" \
       --rolename user
   success "User '${username}' created. Password: ${password}"
@@ -264,14 +265,15 @@ cmd_keycloak_user() {
 # Keycloak: export realm config
 # ---------------------------------------------------------------------------
 cmd_keycloak_export() {
+  local realm="${KEYCLOAK_REALM:-pwa}"
   require_env
-  info "Exporting Keycloak realm 'pwa'..."
-  $DOCKER compose ${COMPOSE_BASE} exec keycloak \
+  info "Exporting Keycloak realm '${realm}'..."
+  $DOCKER compose ${INFRA_BASE} exec keycloak \
     /opt/keycloak/bin/kc.sh export \
-    --realm pwa \
+    --realm "${realm}" \
     --file /tmp/realm-export.json \
     --users realm_file
-  $DOCKER compose ${COMPOSE_BASE} cp keycloak:/tmp/realm-export.json ./infra/keycloak/realm-export.json
+  $DOCKER compose ${INFRA_BASE} cp keycloak:/tmp/realm-export.json ./infra/keycloak/realm-export.json
   success "Realm exported to infra/keycloak/realm-export.json"
 }
 

@@ -5,6 +5,10 @@ COMPOSE_BASE="-f docker-compose.yml"
 COMPOSE_LOCAL="${COMPOSE_BASE} -f docker-compose.local.yml"
 COMPOSE_PROD="${COMPOSE_BASE} -f docker-compose.prod.yml"
 
+INFRA_BASE="--project-name pwa-infra -f docker-compose.infra.yml"
+INFRA_LOCAL="${INFRA_BASE} -f docker-compose.infra.local.yml"
+INFRA_PROD="${INFRA_BASE} -f docker-compose.infra.prod.yml"
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -25,6 +29,17 @@ require_env() {
 
 require_tool() {
   command -v "$1" &>/dev/null || error "$1 is required but not installed."
+}
+
+infra_is_running() {
+  $DOCKER ps --filter "name=pwa-infra-traefik-1" --filter "status=running" --format "{{.Names}}" 2>/dev/null | grep -q "pwa-infra-traefik-1"
+}
+
+ensure_infra() {
+  if ! infra_is_running; then
+    warn "Shared infra is not running. Starting it now..."
+    cmd_infra_up
+  fi
 }
 
 # Use sudo for docker if the current user lacks permission
@@ -56,14 +71,51 @@ cmd_certs() {
 }
 
 # ---------------------------------------------------------------------------
+# Infra: start shared services (Traefik, Keycloak, Postgres, pgAdmin)
+# ---------------------------------------------------------------------------
+cmd_infra_up() {
+  require_env
+  require_tool docker
+  $DOCKER info &>/dev/null || error "Docker daemon is not running. Start it with: sudo systemctl start docker"
+  [ ! -f infra/traefik/certs/local.crt ] && cmd_certs
+  info "Starting shared infra (Traefik, Keycloak, Postgres, pgAdmin)..."
+  $DOCKER compose ${INFRA_LOCAL} up -d
+  success "Infra started. Keycloak may take 30-60s on first boot."
+}
+
+# ---------------------------------------------------------------------------
+# Infra: stop shared services
+# ---------------------------------------------------------------------------
+cmd_infra_down() {
+  info "Stopping shared infra..."
+  $DOCKER compose ${INFRA_BASE} down "$@"
+  success "Infra stopped."
+}
+
+# ---------------------------------------------------------------------------
+# Infra: tail logs
+# ---------------------------------------------------------------------------
+cmd_infra_logs() {
+  local svc="${1:-}"
+  $DOCKER compose ${INFRA_BASE} logs -f ${svc}
+}
+
+# ---------------------------------------------------------------------------
+# Infra: show running infra containers
+# ---------------------------------------------------------------------------
+cmd_infra_status() {
+  $DOCKER compose ${INFRA_BASE} ps
+}
+
+# ---------------------------------------------------------------------------
 # Dev
 # ---------------------------------------------------------------------------
 cmd_dev() {
   require_env
   require_tool docker
   $DOCKER info &>/dev/null || error "Docker daemon is not running. Start it with: sudo systemctl start docker"
-  [ ! -f infra/traefik/certs/local.crt ] && cmd_certs
-  info "Starting services in dev mode..."
+  ensure_infra
+  info "Starting app services in dev mode..."
   $DOCKER compose ${COMPOSE_LOCAL} up --build "$@"
 }
 
@@ -74,7 +126,8 @@ cmd_prod() {
   require_env
   require_tool docker
   $DOCKER info &>/dev/null || error "Docker daemon is not running. Start it with: sudo systemctl start docker"
-  info "Starting services in prod mode..."
+  ensure_infra
+  info "Starting app services in prod mode..."
   $DOCKER compose ${COMPOSE_PROD} up -d --build "$@"
   success "Services started. Run './run.sh logs' to follow output."
 }
@@ -83,7 +136,8 @@ cmd_prod() {
 # Stop
 # ---------------------------------------------------------------------------
 cmd_stop() {
-  info "Stopping all services..."
+  info "Stopping app services (frontend + backend)..."
+  info "Infra keeps running. Use './run.sh infra:down' to stop it."
   $DOCKER compose ${COMPOSE_BASE} down "$@"
 }
 
@@ -116,6 +170,7 @@ cmd_build() {
 # ---------------------------------------------------------------------------
 cmd_db_migrate() {
   require_env
+  ensure_infra
   info "Running Alembic migrations..."
   $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic upgrade head
   success "Migrations applied."
@@ -128,6 +183,7 @@ cmd_db_revision() {
   local msg="${1:-}"
   [ -z "$msg" ] && error "Usage: ./run.sh db:revision \"your message\""
   require_env
+  ensure_infra
   info "Creating Alembic revision: ${msg}"
   $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic revision --autogenerate -m "${msg}"
 }
@@ -140,6 +196,7 @@ cmd_db_reset() {
   read -r confirm
   [ "$confirm" != "yes" ] && { info "Aborted."; exit 0; }
   require_env
+  ensure_infra
   info "Resetting app database..."
   $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic downgrade base
   $DOCKER compose ${COMPOSE_LOCAL} run --rm backend alembic upgrade head
@@ -223,6 +280,7 @@ cmd_keycloak_export() {
 # ---------------------------------------------------------------------------
 cmd_shell() {
   local svc="${1:-backend}"
+  ensure_infra
   $DOCKER compose ${COMPOSE_LOCAL} exec "${svc}" /bin/bash
 }
 
@@ -235,20 +293,30 @@ cmd_help() {
   echo ""
   echo "Usage: ./run.sh <command> [args]"
   echo ""
-  echo "Commands:"
-  echo "  dev                   Start all services (local, with hot reload)"
-  echo "  prod                  Start all services (production mode, detached)"
-  echo "  stop                  Stop all services"
-  echo "  restart               Stop + dev"
-  echo "  logs [service]        Tail logs (all services or specific)"
-  echo "  build                 Rebuild all Docker images"
+  echo -e "${CYAN}Shared infrastructure (run once, shared across projects):${NC}"
+  echo "  infra:up              Start infra: Traefik, Keycloak, Postgres, pgAdmin (detached)"
+  echo "  infra:down            Stop shared infra"
+  echo "  infra:logs [service]  Tail infra logs"
+  echo "  infra:status          Show running infra containers"
+  echo ""
+  echo -e "${CYAN}App services (frontend + backend):${NC}"
+  echo "  dev                   Start app services (local, hot reload) — starts infra if needed"
+  echo "  prod                  Start app services (production mode, detached)"
+  echo "  stop                  Stop app services only (infra keeps running)"
+  echo "  restart               Stop app + dev"
+  echo "  logs [service]        Tail app logs"
+  echo "  build                 Rebuild app Docker images"
+  echo ""
+  echo -e "${CYAN}Database:${NC}"
   echo "  certs                 Generate self-signed TLS certs for local dev"
   echo "  db:migrate            Run Alembic migrations (upgrade head)"
   echo "  db:revision <msg>     Create new Alembic autogenerate revision"
   echo "  db:reset              Drop + recreate app DB (dev only, destructive)"
+  echo ""
+  echo -e "${CYAN}Other:${NC}"
   echo "  frontend:sync         Build Angular + run Capacitor sync"
   echo "  storybook             Start Storybook component explorer (http://localhost:6006)"
-  echo "  keycloak:user [u] [p] Create a dev user in the pwa realm (default: testuser/testpass123)"
+  echo "  keycloak:user [u] [p] Create a dev user in the current realm (default: testuser/testpass123)"
   echo "  keycloak:export       Export Keycloak realm config to infra/keycloak/"
   echo "  shell [service]       Open a bash shell in a service (default: backend)"
   echo ""
@@ -261,6 +329,10 @@ CMD="${1:-help}"
 shift || true
 
 case "$CMD" in
+  infra:up)         cmd_infra_up ;;
+  infra:down)       cmd_infra_down "$@" ;;
+  infra:logs)       cmd_infra_logs "$@" ;;
+  infra:status)     cmd_infra_status ;;
   dev)              cmd_dev "$@" ;;
   prod)             cmd_prod "$@" ;;
   stop)             cmd_stop "$@" ;;

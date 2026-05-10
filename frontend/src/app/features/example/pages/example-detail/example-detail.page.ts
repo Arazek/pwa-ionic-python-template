@@ -3,6 +3,7 @@ import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
+import { TranslocoService } from '@jsverse/transloco';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectSelectedItem } from '../../store/example.selectors';
@@ -14,12 +15,14 @@ import { PageHeaderComponent } from '../../../../shared';
   imports: [AsyncPipe, IonContent, IonButton, PageHeaderComponent],
   template: `
     <app-page-header
-      [title]="(item$ | async)?.title || 'Item Detail'"
+      [title]="(item$ | async)?.title || transloco.translate('items.detail.title')"
       [showBack]="true"
       backHref="/tabs/example"
       [showAvatar]="false"
     >
-      <ion-button slot="end" color="danger" (click)="delete()">Delete</ion-button>
+      <ion-button slot="end" color="danger" (click)="delete()">
+        {{ transloco.translate('common.delete') }}
+      </ion-button>
     </app-page-header>
 
     <ion-content class="ion-padding">
@@ -33,6 +36,7 @@ import { PageHeaderComponent } from '../../../../shared';
 export class ExampleDetailPage implements OnInit {
   private readonly store = inject(Store);
   private readonly route = inject(ActivatedRoute);
+  readonly transloco = inject(TranslocoService);
 
   private itemId = '';
 

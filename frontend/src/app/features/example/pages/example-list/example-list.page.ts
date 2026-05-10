@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectAllItems, selectLoading } from '../../store/example.selectors';
@@ -19,14 +20,14 @@ import { PageHeaderComponent } from '../../../../shared';
   selector: 'app-example-list',
   standalone: true,
   imports: [
-    AsyncPipe, RouterLink,
+    AsyncPipe, RouterLink, TranslocoPipe,
     IonContent,
     IonList, IonItem, IonLabel,
     IonFab, IonFabButton, IonIcon, IonSpinner,
     PageHeaderComponent,
   ],
   template: `
-    <app-page-header title="Items" [userName]="(fullName$ | async) ?? ''" />
+    <app-page-header [title]="'items.title' | transloco" [userName]="(fullName$ | async) ?? ''" />
 
     <ion-content>
       @if (loading$ | async) {

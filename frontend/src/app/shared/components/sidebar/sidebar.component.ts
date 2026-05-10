@@ -26,7 +26,7 @@ export interface SidebarItem {
 
       <div class="sidebar__header">
         @if (!collapsed) {
-          <span class="sidebar__brand">Admin</span>
+          <span class="sidebar__brand">{{ brand }}</span>
         }
         <button class="sidebar__toggle" (click)="toggleCollapsed()" [attr.aria-label]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
           <ion-icon [name]="collapsed ? 'chevron-forward-outline' : 'chevron-back-outline'" />
@@ -90,6 +90,7 @@ export interface SidebarItem {
   `,
 })
 export class SidebarComponent {
+  @Input() brand = 'App';
   @Input() items: SidebarItem[] = [];
   @Input() collapsed = false;
   @Input() activeRoute = '';

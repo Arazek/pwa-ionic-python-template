@@ -5,9 +5,15 @@ import {
   IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { home, list, settingsOutline } from 'ionicons/icons';
+import {
+  homeOutline, home,
+  listOutline, list,
+  personOutline, person,
+  settingsOutline, settingsSharp,
+} from 'ionicons/icons';
 import { BreakpointService } from '../breakpoint.service';
 import { SidebarComponent, SidebarItem } from '../../shared';
+import { NAV_ITEMS } from './nav-items';
 
 @Component({
   selector: 'app-layout',
@@ -21,6 +27,7 @@ import { SidebarComponent, SidebarItem } from '../../shared';
     <div class="app-layout">
       @if (!breakpoint.isMobile()) {
         <app-sidebar
+          brand="PWA Template"
           [items]="navItems"
           [collapsed]="sidebarCollapsed()"
           [activeRoute]="currentUrl()"
@@ -35,20 +42,12 @@ import { SidebarComponent, SidebarItem } from '../../shared';
 
           @if (breakpoint.isMobile()) {
             <ion-tab-bar slot="bottom">
-              <ion-tab-button tab="home" href="/tabs/home">
-                <ion-icon name="home" />
-                <ion-label>Home</ion-label>
-              </ion-tab-button>
-
-              <ion-tab-button tab="example" href="/tabs/example">
-                <ion-icon name="list" />
-                <ion-label>Items</ion-label>
-              </ion-tab-button>
-
-              <ion-tab-button tab="settings" href="/tabs/settings">
-                <ion-icon name="settings-outline" />
-                <ion-label>Settings</ion-label>
-              </ion-tab-button>
+              @for (item of navItems; track item.tab) {
+                <ion-tab-button [tab]="item.tab" [href]="item.route">
+                  <ion-icon [name]="currentUrl().startsWith(item.route ?? '') ? item.iconActive : item.icon" />
+                  <ion-label>{{ item.label }}</ion-label>
+                </ion-tab-button>
+              }
             </ion-tab-bar>
           }
         </ion-tabs>
@@ -58,24 +57,24 @@ import { SidebarComponent, SidebarItem } from '../../shared';
 })
 export class AppLayoutComponent {
   readonly breakpoint = inject(BreakpointService);
-  private router = inject(Router);
+  private readonly router = inject(Router);
 
   readonly sidebarCollapsed = signal(false);
   readonly currentUrl = signal('');
+  readonly navItems = NAV_ITEMS;
 
   constructor() {
-    addIcons({ home, list, settingsOutline });
+    addIcons({
+      homeOutline, home,
+      listOutline, list,
+      personOutline, person,
+      settingsOutline, settingsSharp,
+    });
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
     ).subscribe(e => this.currentUrl.set(e.urlAfterRedirects));
     this.currentUrl.set(this.router.url);
   }
-
-  readonly navItems: SidebarItem[] = [
-    { label: 'Home', icon: 'home-outline', route: '/tabs/home' },
-    { label: 'Items', icon: 'list-outline', route: '/tabs/example' },
-    { label: 'Settings', icon: 'settings-outline', route: '/tabs/settings' },
-  ];
 
   navigate(item: SidebarItem): void {
     if (item.route) {

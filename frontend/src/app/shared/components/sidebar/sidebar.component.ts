@@ -11,6 +11,7 @@ import {
 export interface SidebarItem {
   label: string;
   icon: string;
+  iconActive?: string;
   route?: string;
   badge?: number;
   children?: SidebarItem[];
@@ -43,7 +44,7 @@ export interface SidebarItem {
               [attr.aria-label]="item.label"
               [attr.title]="collapsed ? item.label : null"
             >
-              <ion-icon class="sidebar__icon" [name]="item.icon" />
+              <ion-icon class="sidebar__icon" [name]="activeRoute.startsWith(item.route ?? '') ? item.iconActive ?? item.icon : item.icon" />
               @if (!collapsed) {
                 <span class="sidebar__label">{{ item.label }}</span>
                 @if (item.badge) {

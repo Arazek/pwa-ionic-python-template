@@ -6,7 +6,6 @@ import { IonContent, IonButton } from '@ionic/angular/standalone';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectSelectedItem } from '../../store/example.selectors';
-import { selectUserFullName } from '../../../../store/auth/auth.selectors';
 import { PageHeaderComponent } from '../../../../shared';
 
 @Component({

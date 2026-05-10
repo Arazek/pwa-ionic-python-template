@@ -32,6 +32,6 @@ export const NAV_ITEMS: NavItem[] = [
     tab: 'settings',
     route: '/tabs/settings',
     icon: 'settings-outline',
-    iconActive: 'settings-sharp',
+    iconActive: 'settings',
   },
 ];

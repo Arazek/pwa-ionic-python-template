@@ -9,7 +9,7 @@ import {
   homeOutline, home,
   listOutline, list,
   personOutline, person,
-  settingsOutline, settingsSharp,
+  settingsOutline, settings,
 } from 'ionicons/icons';
 import { BreakpointService } from '../breakpoint.service';
 import { SidebarComponent, SidebarItem } from '../../shared';
@@ -68,7 +68,7 @@ export class AppLayoutComponent {
       homeOutline, home,
       listOutline, list,
       personOutline, person,
-      settingsOutline, settingsSharp,
+      settingsOutline, settings,
     });
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),

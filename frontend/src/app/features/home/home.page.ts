@@ -33,7 +33,7 @@ import { PageHeaderComponent, SectionComponent, CardComponent } from '../../shar
           <app-card class="home-card" [clickable]="true" routerLink="/tabs/settings">
             <div class="home-card__body">
               <p class="home-card__label">Settings</p>
-              <p class="home-card__sub">Theme & account</p>
+              <p class="home-card__sub">Appearance</p>
             </div>
           </app-card>
         </div>

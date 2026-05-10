@@ -7,28 +7,28 @@ export interface NavItem extends SidebarItem {
 
 export const NAV_ITEMS: NavItem[] = [
   {
-    label: 'Home',
+    label: 'nav.home',
     tab: 'home',
     route: '/tabs/home',
     icon: 'home-outline',
     iconActive: 'home',
   },
   {
-    label: 'Items',
+    label: 'nav.items',
     tab: 'example',
     route: '/tabs/example',
     icon: 'list-outline',
     iconActive: 'list',
   },
   {
-    label: 'Profile',
+    label: 'nav.profile',
     tab: 'profile',
     route: '/tabs/profile',
     icon: 'person-outline',
     iconActive: 'person',
   },
   {
-    label: 'Settings',
+    label: 'nav.settings',
     tab: 'settings',
     route: '/tabs/settings',
     icon: 'settings-outline',

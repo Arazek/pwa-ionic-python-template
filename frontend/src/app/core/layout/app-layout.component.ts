@@ -11,6 +11,7 @@ import {
   personOutline, person,
   settingsOutline, settings,
 } from 'ionicons/icons';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { BreakpointService } from '../breakpoint.service';
 import { SidebarComponent, SidebarItem } from '../../shared';
 import { NAV_ITEMS } from './nav-items';
@@ -20,7 +21,7 @@ import { NAV_ITEMS } from './nav-items';
   standalone: true,
   imports: [
     IonTabs, IonTabBar, IonTabButton, IonIcon, IonLabel, IonRouterOutlet,
-    SidebarComponent,
+    SidebarComponent, TranslocoPipe,
   ],
   styleUrl: './app-layout.component.scss',
   template: `
@@ -45,7 +46,7 @@ import { NAV_ITEMS } from './nav-items';
               @for (item of navItems; track item.tab) {
                 <ion-tab-button [tab]="item.tab" [href]="item.route">
                   <ion-icon [name]="currentUrl().startsWith(item.route ?? '') ? item.iconActive : item.icon" />
-                  <ion-label>{{ item.label }}</ion-label>
+                  <ion-label>{{ item.label | transloco }}</ion-label>
                 </ion-tab-button>
               }
             </ion-tab-bar>
@@ -64,15 +65,10 @@ export class AppLayoutComponent {
   readonly navItems = NAV_ITEMS;
 
   constructor() {
-    addIcons({
-      homeOutline, home,
-      listOutline, list,
-      personOutline, person,
-      settingsOutline, settings,
-    });
+    addIcons({ homeOutline, home, listOutline, list, personOutline, person, settingsOutline, settings });
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-    ).subscribe(e => this.currentUrl.set(e.urlAfterRedirects));
+    ).subscribe((e) => this.currentUrl.set(e.urlAfterRedirects));
     this.currentUrl.set(this.router.url);
   }
 

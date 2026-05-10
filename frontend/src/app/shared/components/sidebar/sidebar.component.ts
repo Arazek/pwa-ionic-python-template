@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { IonIcon } from '@ionic/angular/standalone';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { addIcons } from 'ionicons';
 import {
   homeOutline, peopleOutline, settingsOutline, statsChartOutline,
@@ -20,7 +21,7 @@ export interface SidebarItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [IonIcon],
+  imports: [IonIcon, TranslocoPipe],
   styleUrl: './sidebar.component.scss',
   template: `
     <nav class="sidebar" [class.sidebar--collapsed]="collapsed">
@@ -46,7 +47,7 @@ export interface SidebarItem {
             >
               <ion-icon class="sidebar__icon" [name]="activeRoute.startsWith(item.route ?? '') ? item.iconActive ?? item.icon : item.icon" />
               @if (!collapsed) {
-                <span class="sidebar__label">{{ item.label }}</span>
+                <span class="sidebar__label">{{ item.label | transloco }}</span>
                 @if (item.badge) {
                   <span class="sidebar__badge">{{ item.badge > 99 ? '99+' : item.badge }}</span>
                 }
@@ -74,7 +75,7 @@ export interface SidebarItem {
                       (click)="onItemClick(child)"
                     >
                       <ion-icon class="sidebar__icon sidebar__icon--sm" [name]="child.icon" />
-                      <span class="sidebar__label">{{ child.label }}</span>
+                      <span class="sidebar__label">{{ child.label | transloco }}</span>
                       @if (child.badge) {
                         <span class="sidebar__badge">{{ child.badge }}</span>
                       }

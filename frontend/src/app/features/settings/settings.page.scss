@@ -4,43 +4,6 @@
   --background: var(--ion-background-color);
 }
 
-// ─── Profile card ─────────────────────────────────────────────────────────────
-
-.settings-profile {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 24px 20px 20px;
-
-  &__info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    overflow: hidden;
-  }
-
-  &__name {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--ion-text-color);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__email {
-    font-size: 13px;
-    color: var(--ion-color-medium);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
-// ─── List / items ─────────────────────────────────────────────────────────────
-
 .settings-list {
   --background: transparent;
   padding: 0 8px;
@@ -57,15 +20,7 @@
     font-size: 15px;
     font-weight: 500;
   }
-
-  &--danger {
-    --color: var(--ion-color-danger);
-    ion-icon { color: var(--ion-color-danger); }
-    ion-label { color: var(--ion-color-danger); }
-  }
 }
-
-// ─── Color scheme segment ─────────────────────────────────────────────────────
 
 .settings-segment {
   --background: var(--ion-color-light);
@@ -83,8 +38,6 @@
     min-width: 0;
   }
 }
-
-// ─── Accent color picker ──────────────────────────────────────────────────────
 
 .accent-picker {
   display: flex;

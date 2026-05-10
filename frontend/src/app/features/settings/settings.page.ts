@@ -2,18 +2,13 @@ import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import {
   IonContent, IonList, IonItem, IonLabel,
-  IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
+  IonSegment, IonSegmentButton, IonRippleEffect,
 } from '@ionic/angular/standalone';
-import { addIcons } from 'ionicons';
-import { logOutOutline } from 'ionicons/icons';
 import { Store } from '@ngrx/store';
 
 import { ThemeService, ColorScheme, Accent } from '../../core/theme/theme.service';
-import { AuthService } from '../../core/auth/auth.service';
 import { selectUserFullName } from '../../store/auth/auth.selectors';
-import {
-  PageHeaderComponent, SectionComponent, DividerComponent, AvatarComponent,
-} from '../../shared';
+import { PageHeaderComponent, SectionComponent } from '../../shared';
 
 interface AccentOption { value: Accent; color: string; label: string; }
 
@@ -31,23 +26,14 @@ const ACCENT_OPTIONS: AccentOption[] = [
   imports: [
     AsyncPipe,
     IonContent, IonList, IonItem, IonLabel,
-    IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
-    PageHeaderComponent, SectionComponent, DividerComponent, AvatarComponent,
+    IonSegment, IonSegmentButton, IonRippleEffect,
+    PageHeaderComponent, SectionComponent,
   ],
   styleUrl: './settings.page.scss',
   template: `
     <app-page-header title="Settings" [userName]="(fullName$ | async) ?? ''" />
 
     <ion-content class="settings-content">
-
-      <div class="settings-profile">
-        <app-avatar [name]="(fullName$ | async) ?? ''" size="xl" />
-        <div class="settings-profile__info">
-          <p class="settings-profile__name">{{ (fullName$ | async) }}</p>
-        </div>
-      </div>
-
-      <app-divider />
 
       <app-section title="Appearance">
         <ion-list lines="none" class="settings-list">
@@ -85,22 +71,6 @@ const ACCENT_OPTIONS: AccentOption[] = [
         </ion-list>
       </app-section>
 
-      <app-divider />
-
-      <app-section title="Account">
-        <ion-list lines="none" class="settings-list">
-          <ion-item
-            class="settings-item settings-item--danger"
-            button
-            detail="false"
-            (click)="logout()"
-          >
-            <ion-icon slot="start" name="log-out-outline" />
-            <ion-label>Sign out</ion-label>
-          </ion-item>
-        </ion-list>
-      </app-section>
-
     </ion-content>
   `,
 })
@@ -108,9 +78,6 @@ export class SettingsPage {
   readonly theme = inject(ThemeService);
   readonly accentOptions = ACCENT_OPTIONS;
   readonly fullName$ = inject(Store).select(selectUserFullName);
-  private readonly auth = inject(AuthService);
-
-  constructor() { addIcons({ logOutOutline }); }
 
   onSchemeChange(event: CustomEvent): void {
     this.theme.setScheme(event.detail.value as ColorScheme);
@@ -118,9 +85,5 @@ export class SettingsPage {
 
   onAccentChange(accent: Accent): void {
     this.theme.setAccent(accent);
-  }
-
-  logout(): void {
-    this.auth.logout();
   }
 }

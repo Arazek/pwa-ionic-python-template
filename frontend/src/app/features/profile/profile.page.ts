@@ -9,7 +9,7 @@ import {
 } from 'ionicons/icons';
 import { Store } from '@ngrx/store';
 import { combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { selectUserFullName, selectUserProfile } from '../../store/auth/auth.selectors';
@@ -21,13 +21,13 @@ import {
   selector: 'app-profile',
   standalone: true,
   imports: [
-    AsyncPipe,
+    AsyncPipe, TranslocoPipe,
     IonContent, IonList, IonItem, IonLabel, IonIcon,
     PageHeaderComponent, SectionComponent, AvatarComponent, DividerComponent,
   ],
   styleUrl: './profile.page.scss',
   template: `
-    <app-page-header title="Profile" [userName]="(vm$ | async)?.fullName ?? ''" [showAvatar]="false" />
+    <app-page-header [title]="'profile.title' | transloco" [userName]="(vm$ | async)?.fullName ?? ''" [showAvatar]="false" />
 
     <ion-content class="profile-content">
       @if (vm$ | async; as vm) {
@@ -39,13 +39,13 @@ import {
 
         <app-divider />
 
-        <app-section title="Account details">
+        <app-section [title]="'profile.section.details' | transloco">
           <ion-list lines="none" class="profile-list">
 
             <ion-item class="profile-item">
               <ion-icon slot="start" name="person-outline" class="profile-item__icon" />
               <ion-label>
-                <p class="profile-item__label">First name</p>
+                <p class="profile-item__label">{{ 'profile.field.firstName' | transloco }}</p>
                 <p class="profile-item__value">{{ vm.profile?.firstName || '—' }}</p>
               </ion-label>
             </ion-item>
@@ -53,7 +53,7 @@ import {
             <ion-item class="profile-item">
               <ion-icon slot="start" name="person-outline" class="profile-item__icon" />
               <ion-label>
-                <p class="profile-item__label">Last name</p>
+                <p class="profile-item__label">{{ 'profile.field.lastName' | transloco }}</p>
                 <p class="profile-item__value">{{ vm.profile?.lastName || '—' }}</p>
               </ion-label>
             </ion-item>
@@ -61,7 +61,7 @@ import {
             <ion-item class="profile-item">
               <ion-icon slot="start" name="mail-outline" class="profile-item__icon" />
               <ion-label>
-                <p class="profile-item__label">Email</p>
+                <p class="profile-item__label">{{ 'profile.field.email' | transloco }}</p>
                 <p class="profile-item__value">{{ vm.profile?.email || '—' }}</p>
               </ion-label>
             </ion-item>
@@ -69,7 +69,7 @@ import {
             <ion-item class="profile-item">
               <ion-icon slot="start" name="id-card-outline" class="profile-item__icon" />
               <ion-label>
-                <p class="profile-item__label">Username</p>
+                <p class="profile-item__label">{{ 'profile.field.username' | transloco }}</p>
                 <p class="profile-item__value">{{ vm.profile?.username || '—' }}</p>
               </ion-label>
             </ion-item>
@@ -77,8 +77,10 @@ import {
             <ion-item class="profile-item">
               <ion-icon slot="start" name="shield-checkmark-outline" class="profile-item__icon" />
               <ion-label>
-                <p class="profile-item__label">Email verified</p>
-                <p class="profile-item__value">{{ vm.profile?.emailVerified ? 'Yes' : 'No' }}</p>
+                <p class="profile-item__label">{{ 'profile.field.emailVerified' | transloco }}</p>
+                <p class="profile-item__value">
+                  {{ vm.profile?.emailVerified ? ('profile.emailVerified.yes' | transloco) : ('profile.emailVerified.no' | transloco) }}
+                </p>
               </ion-label>
             </ion-item>
 
@@ -87,7 +89,7 @@ import {
 
         <app-divider />
 
-        <app-section title="Session">
+        <app-section [title]="'profile.section.session' | transloco">
           <ion-list lines="none" class="profile-list">
             <ion-item
               class="profile-item profile-item--danger"
@@ -96,7 +98,7 @@ import {
               (click)="logout()"
             >
               <ion-icon slot="start" name="log-out-outline" class="profile-item__icon" />
-              <ion-label>Sign out</ion-label>
+              <ion-label>{{ 'profile.signOut' | transloco }}</ion-label>
             </ion-item>
           </ion-list>
         </app-section>

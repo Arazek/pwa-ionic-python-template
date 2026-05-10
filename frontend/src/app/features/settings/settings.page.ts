@@ -2,10 +2,9 @@ import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import {
   IonContent, IonList, IonItem, IonLabel,
-  IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
+  IonSegment, IonSegmentButton, IonRippleEffect,
 } from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
-import { addIcons } from 'ionicons';
 
 import { ThemeService, ColorScheme, Accent } from '../../core/theme/theme.service';
 import { selectUserFullName } from '../../store/auth/auth.selectors';
@@ -27,7 +26,7 @@ const ACCENT_OPTIONS: AccentOption[] = [
   imports: [
     AsyncPipe,
     IonContent, IonList, IonItem, IonLabel,
-    IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
+    IonSegment, IonSegmentButton, IonRippleEffect,
     PageHeaderComponent, SectionComponent,
   ],
   styleUrl: './settings.page.scss',
@@ -79,8 +78,6 @@ export class SettingsPage {
   readonly theme = inject(ThemeService);
   readonly accentOptions = ACCENT_OPTIONS;
   readonly fullName$ = inject(Store).select(selectUserFullName);
-
-  constructor() { addIcons({}); }
 
   onSchemeChange(event: CustomEvent): void {
     this.theme.setScheme(event.detail.value as ColorScheme);

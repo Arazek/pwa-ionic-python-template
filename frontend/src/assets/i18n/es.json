@@ -1,0 +1,49 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "items": "Elementos",
+    "profile": "Perfil",
+    "settings": "Ajustes"
+  },
+  "home": {
+    "title": "Inicio",
+    "greeting": "Bienvenido,",
+    "greeting.fallback": "ahí",
+    "section.quickActions": "Acciones rápidas",
+    "card.browse": "Explorar",
+    "card.browseDesc": "Ver todos los elementos",
+    "card.settings": "Ajustes",
+    "card.settingsDesc": "Apariencia"
+  },
+  "profile": {
+    "title": "Perfil",
+    "section.details": "Detalles de cuenta",
+    "section.session": "Sesión",
+    "field.firstName": "Nombre",
+    "field.lastName": "Apellido",
+    "field.email": "Correo electrónico",
+    "field.username": "Nombre de usuario",
+    "field.emailVerified": "Correo verificado",
+    "emailVerified.yes": "Sí",
+    "emailVerified.no": "No",
+    "signOut": "Cerrar sesión"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "section.appearance": "Apariencia",
+    "section.language": "Idioma",
+    "colorScheme": "Esquema de color",
+    "colorScheme.light": "Claro",
+    "colorScheme.auto": "Auto",
+    "colorScheme.dark": "Oscuro",
+    "accentColor": "Color de acento",
+    "language": "Idioma"
+  },
+  "items": {
+    "title": "Elementos",
+    "detail.title": "Elemento"
+  },
+  "common": {
+    "delete": "Eliminar"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "nav": {
+    "home": "Home",
+    "items": "Items",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Home",
+    "greeting": "Welcome back,",
+    "greeting.fallback": "there",
+    "section.quickActions": "Quick actions",
+    "card.browse": "Browse",
+    "card.browseDesc": "View all items",
+    "card.settings": "Settings",
+    "card.settingsDesc": "Appearance"
+  },
+  "profile": {
+    "title": "Profile",
+    "section.details": "Account details",
+    "section.session": "Session",
+    "field.firstName": "First name",
+    "field.lastName": "Last name",
+    "field.email": "Email",
+    "field.username": "Username",
+    "field.emailVerified": "Email verified",
+    "emailVerified.yes": "Yes",
+    "emailVerified.no": "No",
+    "signOut": "Sign out"
+  },
+  "settings": {
+    "title": "Settings",
+    "section.appearance": "Appearance",
+    "section.language": "Language",
+    "colorScheme": "Color scheme",
+    "colorScheme.light": "Light",
+    "colorScheme.auto": "Auto",
+    "colorScheme.dark": "Dark",
+    "accentColor": "Accent color",
+    "language": "Language"
+  },
+  "items": {
+    "title": "Items",
+    "detail.title": "Item"
+  },
+  "common": {
+    "delete": "Delete"
+  }
+}

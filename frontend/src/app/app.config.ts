@@ -8,6 +8,7 @@ import { provideEffects } from '@ngrx/effects';
 import { provideRouterStore } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideIonicAngular } from '@ionic/angular/standalone';
+import { provideTransloco } from '@jsverse/transloco';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
 
 import { routes } from './app.routes';
@@ -15,6 +16,7 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { rootReducers, rootEffects } from './store';
 import { environment } from '../environments/environment';
+import { TranslocoHttpLoader } from './core/i18n/transloco-http-loader';
 
 function initializeKeycloak(keycloak: KeycloakService) {
   return async () => {
@@ -52,6 +54,15 @@ export const appConfig: ApplicationConfig = {
     provideEffects(rootEffects),
     provideRouterStore(),
     provideStoreDevtools({ maxAge: 25, logOnly: environment.production }),
+    provideTransloco({
+      config: {
+        availableLangs: ['en', 'es'],
+        defaultLang: 'en',
+        reRenderOnLangChange: true,
+        prodMode: environment.production,
+      },
+      loader: TranslocoHttpLoader,
+    }),
     KeycloakAngularModule,
     KeycloakService,
     {

@@ -30,7 +30,7 @@ export interface SidebarItem {
         @if (!collapsed) {
           <span class="sidebar__brand">{{ brand }}</span>
         }
-        <button class="sidebar__toggle" (click)="toggleCollapsed()" [attr.aria-label]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+        <button class="sidebar__toggle" (click)="toggleCollapsed()" [attr.aria-label]="(collapsed ? 'sidebar.expand' : 'sidebar.collapse') | transloco">
           <ion-icon [name]="collapsed ? 'chevron-forward-outline' : 'chevron-back-outline'" />
         </button>
       </div>
@@ -42,8 +42,8 @@ export interface SidebarItem {
               class="sidebar__link"
               [class.sidebar__link--active]="activeRoute === item.route"
               (click)="onItemClick(item)"
-              [attr.aria-label]="item.label"
-              [attr.title]="collapsed ? item.label : null"
+              [attr.aria-label]="item.label | transloco"
+              [attr.title]="collapsed ? (item.label | transloco) : null"
             >
               <ion-icon class="sidebar__icon" [name]="activeRoute.startsWith(item.route ?? '') ? item.iconActive ?? item.icon : item.icon" />
               @if (!collapsed) {

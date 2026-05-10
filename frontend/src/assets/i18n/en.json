@@ -41,9 +41,15 @@
   },
   "items": {
     "title": "Items",
-    "detail.title": "Item"
+    "detail.title": "Item",
+    "new.title": "New Item",
+    "new.description": "Description"
   },
   "common": {
     "delete": "Delete"
+  },
+  "sidebar": {
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   }
 }

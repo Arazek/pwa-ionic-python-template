@@ -9,7 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectAllItems, selectLoading } from '../../store/example.selectors';
@@ -55,6 +55,7 @@ import { PageHeaderComponent } from '../../../../shared';
 })
 export class ExampleListPage implements OnInit {
   private readonly store = inject(Store);
+  private readonly transloco = inject(TranslocoService);
 
   readonly items$ = this.store.select(selectAllItems);
   readonly loading$ = this.store.select(selectLoading);
@@ -68,7 +69,10 @@ export class ExampleListPage implements OnInit {
 
   createItem(): void {
     this.store.dispatch(
-      ExampleActions.createItem({ title: 'New Item', description: 'Description' }),
+      ExampleActions.createItem({
+        title: this.transloco.translate('items.new.title'),
+        description: this.transloco.translate('items.new.description'),
+      }),
     );
   }
 }

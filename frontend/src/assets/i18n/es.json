@@ -41,9 +41,15 @@
   },
   "items": {
     "title": "Elementos",
-    "detail.title": "Elemento"
+    "detail.title": "Elemento",
+    "new.title": "Nuevo elemento",
+    "new.description": "Descripción"
   },
   "common": {
     "delete": "Eliminar"
+  },
+  "sidebar": {
+    "collapse": "Contraer barra lateral",
+    "expand": "Expandir barra lateral"
   }
 }

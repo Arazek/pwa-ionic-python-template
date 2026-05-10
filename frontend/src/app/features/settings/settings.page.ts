@@ -5,8 +5,10 @@ import {
   IonSegment, IonSegmentButton, IonRippleEffect,
 } from '@ionic/angular/standalone';
 import { Store } from '@ngrx/store';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 import { ThemeService, ColorScheme, Accent } from '../../core/theme/theme.service';
+import { I18nService } from '../../core/i18n/i18n.service';
 import { selectUserFullName } from '../../store/auth/auth.selectors';
 import { PageHeaderComponent, SectionComponent } from '../../shared';
 
@@ -24,35 +26,35 @@ const ACCENT_OPTIONS: AccentOption[] = [
   selector: 'app-settings',
   standalone: true,
   imports: [
-    AsyncPipe,
+    AsyncPipe, TranslocoPipe,
     IonContent, IonList, IonItem, IonLabel,
     IonSegment, IonSegmentButton, IonRippleEffect,
     PageHeaderComponent, SectionComponent,
   ],
   styleUrl: './settings.page.scss',
   template: `
-    <app-page-header title="Settings" [userName]="(fullName$ | async) ?? ''" />
+    <app-page-header [title]="'settings.title' | transloco" [userName]="(fullName$ | async) ?? ''" />
 
     <ion-content class="settings-content">
 
-      <app-section title="Appearance">
+      <app-section [title]="'settings.section.appearance' | transloco">
         <ion-list lines="none" class="settings-list">
 
           <ion-item class="settings-item">
-            <ion-label>Color scheme</ion-label>
+            <ion-label>{{ 'settings.colorScheme' | transloco }}</ion-label>
             <ion-segment
               class="settings-segment"
               [value]="theme.scheme()"
               (ionChange)="onSchemeChange($event)"
             >
-              <ion-segment-button value="light">Light</ion-segment-button>
-              <ion-segment-button value="system">Auto</ion-segment-button>
-              <ion-segment-button value="dark">Dark</ion-segment-button>
+              <ion-segment-button value="light">{{ 'settings.colorScheme.light' | transloco }}</ion-segment-button>
+              <ion-segment-button value="system">{{ 'settings.colorScheme.auto' | transloco }}</ion-segment-button>
+              <ion-segment-button value="dark">{{ 'settings.colorScheme.dark' | transloco }}</ion-segment-button>
             </ion-segment>
           </ion-item>
 
           <ion-item class="settings-item">
-            <ion-label>Accent color</ion-label>
+            <ion-label>{{ 'settings.accentColor' | transloco }}</ion-label>
             <div class="accent-picker">
               @for (opt of accentOptions; track opt.label) {
                 <button
@@ -71,11 +73,29 @@ const ACCENT_OPTIONS: AccentOption[] = [
         </ion-list>
       </app-section>
 
+      <app-section [title]="'settings.section.language' | transloco">
+        <ion-list lines="none" class="settings-list">
+          <ion-item class="settings-item">
+            <ion-label>{{ 'settings.language' | transloco }}</ion-label>
+            <ion-segment
+              class="settings-segment"
+              [value]="i18n.activeLang()"
+              (ionChange)="onLangChange($event)"
+            >
+              @for (lang of i18n.availableLangs; track lang.code) {
+                <ion-segment-button [value]="lang.code">{{ lang.label }}</ion-segment-button>
+              }
+            </ion-segment>
+          </ion-item>
+        </ion-list>
+      </app-section>
+
     </ion-content>
   `,
 })
 export class SettingsPage {
   readonly theme = inject(ThemeService);
+  readonly i18n = inject(I18nService);
   readonly accentOptions = ACCENT_OPTIONS;
   readonly fullName$ = inject(Store).select(selectUserFullName);
 
@@ -85,5 +105,9 @@ export class SettingsPage {
 
   onAccentChange(accent: Accent): void {
     this.theme.setAccent(accent);
+  }
+
+  onLangChange(event: CustomEvent): void {
+    this.i18n.setLang(event.detail.value as string);
   }
 }

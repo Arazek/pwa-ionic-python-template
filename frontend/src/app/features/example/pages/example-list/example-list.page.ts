@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -12,6 +12,7 @@ import { add } from 'ionicons/icons';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectAllItems, selectLoading } from '../../store/example.selectors';
+import { selectUserFullName } from '../../../../store/auth/auth.selectors';
 import { PageHeaderComponent } from '../../../../shared';
 
 @Component({
@@ -25,7 +26,7 @@ import { PageHeaderComponent } from '../../../../shared';
     PageHeaderComponent,
   ],
   template: `
-    <app-page-header title="Items" />
+    <app-page-header title="Items" [userName]="(fullName$ | async) ?? ''" />
 
     <ion-content>
       @if (loading$ | async) {
@@ -52,12 +53,13 @@ import { PageHeaderComponent } from '../../../../shared';
   `,
 })
 export class ExampleListPage implements OnInit {
-  items$ = this.store.select(selectAllItems);
-  loading$ = this.store.select(selectLoading);
+  private readonly store = inject(Store);
 
-  constructor(private store: Store) {
-    addIcons({ add });
-  }
+  readonly items$ = this.store.select(selectAllItems);
+  readonly loading$ = this.store.select(selectLoading);
+  readonly fullName$ = this.store.select(selectUserFullName);
+
+  constructor() { addIcons({ add }); }
 
   ngOnInit(): void {
     this.store.dispatch(ExampleActions.loadItems());

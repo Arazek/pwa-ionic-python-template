@@ -1,16 +1,20 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonButton, IonIcon } from '@ionic/angular/standalone';
+import {
+  IonHeader, IonToolbar, IonTitle, IonButtons,
+  IonBackButton, IonButton, IonIcon,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { menuOutline } from 'ionicons/icons';
-import { KeycloakProfile } from 'keycloak-js';
-import { AuthService } from '../../../core/auth/auth.service';
 import { AvatarComponent } from '../avatar/avatar.component';
 
 @Component({
   selector: 'app-page-header',
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonButton, IonIcon, AvatarComponent],
+  imports: [
+    IonHeader, IonToolbar, IonTitle, IonButtons,
+    IonBackButton, IonButton, IonIcon, AvatarComponent,
+  ],
   styleUrl: './page-header.component.scss',
   template: `
     <ion-header class="page-header" [translucent]="translucent">
@@ -31,7 +35,7 @@ import { AvatarComponent } from '../avatar/avatar.component';
           <ng-content select="[slot=end]" />
           @if (showAvatar) {
             <button class="page-header__avatar-btn" (click)="goToProfile()" aria-label="Profile">
-              <app-avatar [name]="fullName" size="sm" />
+              <app-avatar [name]="userName" size="sm" />
             </button>
           }
         </ion-buttons>
@@ -39,26 +43,8 @@ import { AvatarComponent } from '../avatar/avatar.component';
     </ion-header>
   `,
 })
-export class PageHeaderComponent implements OnInit {
-  private auth = inject(AuthService);
-  private router = inject(Router);
-
-  profile: KeycloakProfile | null = null;
-
-  get fullName(): string {
-    if (!this.profile) return '';
-    return [this.profile.firstName, this.profile.lastName].filter(Boolean).join(' ');
-  }
-
-  constructor() { addIcons({ menuOutline }); }
-
-  async ngOnInit(): Promise<void> {
-    this.profile = await this.auth.getProfile();
-  }
-
-  goToProfile(): void {
-    this.router.navigateByUrl('/tabs/profile');
-  }
+export class PageHeaderComponent {
+  private readonly router = inject(Router);
 
   @Input() title = '';
   @Input() showBack = false;
@@ -66,5 +52,12 @@ export class PageHeaderComponent implements OnInit {
   @Input() translucent = true;
   @Input() showMenu = false;
   @Input() showAvatar = true;
+  @Input() userName = '';
   @Output() menuClick = new EventEmitter<void>();
+
+  constructor() { addIcons({ menuOutline }); }
+
+  goToProfile(): void {
+    this.router.navigateByUrl('/tabs/profile');
+  }
 }

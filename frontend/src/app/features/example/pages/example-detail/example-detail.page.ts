@@ -1,25 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import {
-  IonContent, IonButton,
-} from '@ionic/angular/standalone';
+import { IonContent, IonButton } from '@ionic/angular/standalone';
 
 import { ExampleActions } from '../../store/example.actions';
 import { selectSelectedItem } from '../../store/example.selectors';
+import { selectUserFullName } from '../../../../store/auth/auth.selectors';
 import { PageHeaderComponent } from '../../../../shared';
 
 @Component({
   selector: 'app-example-detail',
   standalone: true,
-  imports: [
-    AsyncPipe,
-    IonContent, IonButton,
-    PageHeaderComponent,
-  ],
+  imports: [AsyncPipe, IonContent, IonButton, PageHeaderComponent],
   template: `
-    <app-page-header [title]="(item$ | async)?.title || 'Item Detail'" [showBack]="true" backHref="/tabs/example" [showAvatar]="false">
+    <app-page-header
+      [title]="(item$ | async)?.title || 'Item Detail'"
+      [showBack]="true"
+      backHref="/tabs/example"
+      [showAvatar]="false"
+    >
       <ion-button slot="end" color="danger" (click)="delete()">Delete</ion-button>
     </app-page-header>
 
@@ -32,20 +32,19 @@ import { PageHeaderComponent } from '../../../../shared';
   `,
 })
 export class ExampleDetailPage implements OnInit {
-  item$ = this.store.select(selectSelectedItem);
+  private readonly store = inject(Store);
+  private readonly route = inject(ActivatedRoute);
 
-  constructor(
-    private store: Store,
-    private route: ActivatedRoute,
-  ) {}
+  private itemId = '';
+
+  readonly item$ = this.store.select(selectSelectedItem);
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    this.store.dispatch(ExampleActions.selectItem({ id }));
+    this.itemId = this.route.snapshot.paramMap.get('id') ?? '';
+    this.store.dispatch(ExampleActions.selectItem({ id: this.itemId }));
   }
 
   delete(): void {
-    const id = this.route.snapshot.paramMap.get('id')!;
-    this.store.dispatch(ExampleActions.deleteItem({ id }));
+    this.store.dispatch(ExampleActions.deleteItem({ id: this.itemId }));
   }
 }

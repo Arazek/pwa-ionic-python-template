@@ -1,14 +1,16 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
 import {
   IonContent, IonList, IonItem, IonLabel,
   IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logOutOutline, chevronForward } from 'ionicons/icons';
-import { KeycloakProfile } from 'keycloak-js';
+import { logOutOutline } from 'ionicons/icons';
+import { Store } from '@ngrx/store';
 
-import { AuthService } from '../../core/auth/auth.service';
 import { ThemeService, ColorScheme, Accent } from '../../core/theme/theme.service';
+import { AuthService } from '../../core/auth/auth.service';
+import { selectUserFullName } from '../../store/auth/auth.selectors';
 import {
   PageHeaderComponent, SectionComponent, DividerComponent, AvatarComponent,
 } from '../../shared';
@@ -27,28 +29,26 @@ const ACCENT_OPTIONS: AccentOption[] = [
   selector: 'app-settings',
   standalone: true,
   imports: [
+    AsyncPipe,
     IonContent, IonList, IonItem, IonLabel,
     IonSegment, IonSegmentButton, IonIcon, IonRippleEffect,
     PageHeaderComponent, SectionComponent, DividerComponent, AvatarComponent,
   ],
   styleUrl: './settings.page.scss',
   template: `
-    <app-page-header title="Settings" />
+    <app-page-header title="Settings" [userName]="(fullName$ | async) ?? ''" />
 
     <ion-content class="settings-content">
 
-      <!-- Profile -->
       <div class="settings-profile">
-        <app-avatar [name]="fullName" size="xl" />
+        <app-avatar [name]="(fullName$ | async) ?? ''" size="xl" />
         <div class="settings-profile__info">
-          <p class="settings-profile__name">{{ fullName }}</p>
-          <p class="settings-profile__email">{{ profile?.email }}</p>
+          <p class="settings-profile__name">{{ (fullName$ | async) }}</p>
         </div>
       </div>
 
       <app-divider />
 
-      <!-- Appearance -->
       <app-section title="Appearance">
         <ion-list lines="none" class="settings-list">
 
@@ -87,7 +87,6 @@ const ACCENT_OPTIONS: AccentOption[] = [
 
       <app-divider />
 
-      <!-- Account -->
       <app-section title="Account">
         <ion-list lines="none" class="settings-list">
           <ion-item
@@ -105,24 +104,13 @@ const ACCENT_OPTIONS: AccentOption[] = [
     </ion-content>
   `,
 })
-export class SettingsPage implements OnInit {
+export class SettingsPage {
   readonly theme = inject(ThemeService);
   readonly accentOptions = ACCENT_OPTIONS;
+  readonly fullName$ = inject(Store).select(selectUserFullName);
+  private readonly auth = inject(AuthService);
 
-  profile: KeycloakProfile | null = null;
-
-  get fullName(): string {
-    if (!this.profile) return '';
-    return [this.profile.firstName, this.profile.lastName].filter(Boolean).join(' ');
-  }
-
-  constructor(private auth: AuthService) {
-    addIcons({ logOutOutline, chevronForward });
-  }
-
-  async ngOnInit(): Promise<void> {
-    this.profile = await this.auth.getProfile();
-  }
+  constructor() { addIcons({ logOutOutline }); }
 
   onSchemeChange(event: CustomEvent): void {
     this.theme.setScheme(event.detail.value as ColorScheme);

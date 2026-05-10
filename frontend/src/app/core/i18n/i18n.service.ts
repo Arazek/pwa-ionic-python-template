@@ -19,8 +19,8 @@ export class I18nService {
 
   constructor() {
     const saved = localStorage.getItem('lang') ?? 'en';
-    this.transloco.load('en').subscribe();
-    this.transloco.load('es').subscribe();
+    this.transloco.load('en').subscribe({ error: (e) => console.error('[I18nService] Failed to load en:', e) });
+    this.transloco.load('es').subscribe({ error: (e) => console.error('[I18nService] Failed to load es:', e) });
     this.setLang(saved);
   }
 

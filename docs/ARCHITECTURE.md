@@ -52,15 +52,17 @@ pwa-template/
 ├── frontend/                        # Ionic/Angular PWA + Capacitor
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── core/                # Auth, HTTP interceptors, guards, error handling
-│   │   │   │   ├── auth/            # Keycloak service, auth guard, token interceptor, LoginPage
-│   │   │   │   ├── interceptors/    # HTTP error interceptor
-│   │   │   │   ├── layout/          # AppLayoutComponent — responsive shell (sidebar desktop / tab bar mobile)
+│   │   │   ├── core/                # Auth, HTTP interceptors, guards, i18n, layout
+│   │   │   │   ├── auth/            # KeycloakService, authGuard, loginGuard, LoginPage, SessionCheckService
+│   │   │   │   ├── i18n/            # I18nService, TranslocoHttpLoader
+│   │   │   │   ├── interceptors/    # auth (Bearer token), error (401 → re-login)
+│   │   │   │   ├── layout/          # AppLayoutComponent + nav-items.ts (single nav source of truth)
 │   │   │   │   ├── breakpoint.service.ts  # Reactive `isMobile` signal via matchMedia
 │   │   │   │   └── theme/           # ThemeService — scheme + accent, persisted to localStorage
 │   │   │   ├── features/            # Feature slices (one folder per domain)
 │   │   │   │   ├── home/            # HomePage — greeting + avatar + quick-action cards
-│   │   │   │   ├── settings/        # SettingsPage — profile, appearance picker, sign out
+│   │   │   │   ├── settings/        # SettingsPage — appearance picker (scheme, accent, language)
+│   │   │   │   ├── profile/         # ProfilePage — user details, avatar hero, sign out
 │   │   │   │   └── example/         # Example feature (full NgRx pattern)
 │   │   │   │       ├── components/
 │   │   │   │       ├── pages/
@@ -71,9 +73,10 @@ pwa-template/
 │   │   │   │       │   ├── example.selectors.ts
 │   │   │   │       │   └── example.state.ts
 │   │   │   │       └── example.routes.ts
-│   │   │   ├── shared/              # Shared components, pipes, directives (27 components)
+│   │   │   ├── shared/              # Shared components, pipes, directives, services
 │   │   │   │   └── index.ts         # Barrel — re-exports all shared components/types
 │   │   │   ├── store/               # Root NgRx store registration
+│   │   │   │   ├── auth/            # Auth slice — profile loaded once at boot
 │   │   │   │   └── app.state.ts
 │   │   │   ├── app.config.ts        # Standalone app config (provideRouter, provideStore...)
 │   │   │   └── app.routes.ts        # Root routes (lazy-loaded features)
@@ -224,8 +227,11 @@ WS   /api/v1/ws/example          → protected WebSocket
 All authenticated pages are children of `AppLayoutComponent` (`core/layout/app-layout.component.ts`),
 which provides a responsive navigation shell:
 
-- **Desktop** (>= 768px): collapsible `app-sidebar` on the left with nav items (Home, Items, Settings)
-- **Mobile** (< 768px): bottom `ion-tab-bar` with the same nav items
+- **Desktop** (>= 768px): collapsible `<app-sidebar>` on the left with nav items and brand label
+- **Mobile** (< 768px): bottom `<ion-tab-bar>` with the same nav items
+- Navigation items are defined in `nav-items.ts` (`NAV_ITEMS`) as the single source of truth — consumed by both sidebar and tab bar via `@for` loops
+- Nav items: Home, Items, Profile, Settings — each with `icon`/`iconActive` for inactive/active states
+- The sidebar accepts a `brand` input (e.g. "PWA Template") rendered at the top
 
 The breakpoint is managed by `BreakpointService` (`core/breakpoint.service.ts`)
 using `window.matchMedia('(max-width: 767px)')` as a reactive signal.
@@ -242,7 +248,7 @@ overlaying and hiding the sidebar. See `app-layout.component.scss`.
 |-------------------|------------------|------------------------------------------------------|
 | `/login`          | `LoginPage`      | Logo + social login buttons + "sign in with email"   |
 | `/tabs/home`      | `HomePage`       | Welcome greeting, user avatar, quick-action cards    |
-| `/tabs/settings`  | `SettingsPage`   | Accent/scheme picker, sign out                       |
+| `/tabs/settings`  | `SettingsPage`   | Appearance picker (scheme, accent, language)         |
 | `/tabs/profile`   | `ProfilePage`    | User details (name, email, username, email verified) |
 | `/tabs/example`   | `ExampleListPage`| Example CRUD feature (list + detail)                 |
 
@@ -259,7 +265,7 @@ CSS is in `src/theme/variables.scss`:
 - `body.dark` + `body:not(.light):not(.dark) @media (prefers-color-scheme: dark)` — applies dark tokens
 - `body[data-accent='*']` — applies light accent tokens; dark overrides nested inside `body.dark`
 
-The `SettingsPage` exposes the full picker UI (scheme segment + 5 accent swatches).
+The `SettingsPage` exposes the full picker UI (scheme segment + 5 accent swatches + language switcher).
 
 ### Shared Component Library
 
@@ -280,6 +286,13 @@ Every component has a co-located `.stories.ts` (Storybook) and `.scss` (BEM-styl
 ```
 store/
   app.state.ts         ← root state interface
+
+store/auth/
+  auth.state.ts        ← auth state interface + initial state
+  auth.actions.ts      ← loadProfile, loadProfileSuccess, loadProfileFailure
+  auth.reducer.ts      ← pure reducer
+  auth.selectors.ts    ← selectUserFullName, selectUserProfile
+  auth.effects.ts      ← side effects (HTTP calls via AuthApiService)
 
 features/example/store/
   example.state.ts     ← feature state interface + initial state

@@ -41,11 +41,12 @@ at the end of your response — do not fix it unless asked.
 3. [Frontend — Angular / Ionic](#frontend--angular--ionic)
 4. [Frontend — SCSS & BEM](#frontend--scss--bem)
 5. [Frontend — NgRx](#frontend--ngrx)
-6. [Backend — Python / FastAPI](#backend--python--fastapi)
-7. [Backend — Database & Alembic](#backend--database--alembic)
-8. [Environment Variables](#environment-variables)
-9. [Docker](#docker)
-10. [Storybook](#storybook)
+6. [Frontend — i18n (Transloco)](#frontend--i18n-transloco)
+7. [Backend — Python / FastAPI](#backend--python--fastapi)
+8. [Backend — Database & Alembic](#backend--database--alembic)
+9. [Environment Variables](#environment-variables)
+10. [Docker](#docker)
+11. [Storybook](#storybook)
 
 ---
 
@@ -254,6 +255,8 @@ Breakpoint is managed by `BreakpointService.isMobile` signal — never read `win
 ```
 
 **Routing structure**: `ion-tabs` wraps a single `<ion-router-outlet />`. Tab buttons use `href` for navigation (standard Angular routing, not Ionic tab routing). The tab bar is conditionally rendered via `@if (breakpoint.isMobile())`.
+
+**Navigation items**: `NAV_ITEMS` (`core/layout/nav-items.ts`) is the single source of truth — an array of `NavItem` objects consumed by both the desktop sidebar and the mobile tab bar via `@for` loops. When adding a new feature that needs nav, add it to `NAV_ITEMS` and register the lazy route in `app.routes.ts`. Each item has `label` (transloco key), `tab`, `route`, `icon`, and `iconActive`.
 
 **Route registration**: New features add lazy-loaded route children under `/tabs/<name>` in `app.routes.ts`. Each feature has its own `<name>.routes.ts` file. Feature routes do NOT re-declare the layout — they are children of the tabs route which is already inside `AppLayoutComponent`.
 
@@ -522,6 +525,72 @@ loadItems$ = createEffect(() =>
   ),
 );
 ```
+
+---
+
+## Frontend — i18n (Transloco)
+
+Internationalization uses `@jsverse/transloco`. Translation files are JSON key-value pairs in `frontend/src/assets/i18n/` (`en.json`, `es.json`).
+
+### Translation keys
+
+- Keys are flat dot-separated strings grouped by feature: `home.title`, `settings.section.appearance`, `nav.home`
+- Use nested JSON objects for organization, referenced via dot notation
+- Add keys to ALL language files simultaneously — missing keys fall back to the key itself
+
+```json
+{
+  "home": {
+    "title": "Home",
+    "greeting": "Welcome back,"
+  }
+}
+```
+
+### In templates
+
+Always use the `transloco` pipe for user-facing strings. Never hardcode English text in templates.
+
+```html
+<!-- Correct -->
+<h1>{{ 'home.title' | transloco }}</h1>
+<ion-label>{{ 'nav.settings' | transloco }}</ion-label>
+
+<!-- Wrong -->
+<h1>Home</h1>
+```
+
+### In component code
+
+Use `TranslocoService.translate()` for strings needed imperatively (e.g. dispatched values, dynamic messages).
+
+```ts
+private readonly transloco = inject(TranslocoService);
+
+createItem(): void {
+  this.store.dispatch(ExampleActions.createItem({
+    title: this.transloco.translate('items.new.title'),
+    description: this.transloco.translate('items.new.description'),
+  }));
+}
+```
+
+### Language persistence
+
+`I18nService` (`core/i18n/i18n.service.ts`) manages the active language:
+- Persists the user's choice to `localStorage` (key: `lang`)
+- Defaults to `'en'` on first visit
+- Exposes `activeLang` signal and `availableLangs` array
+- Preloads all translation files in the constructor
+
+Never set `localStorage.setItem('lang', ...)` or call `transloco.setActiveLang()` directly — always go through `I18nService.setLang()`.
+
+### Adding a new language
+
+1. Add the JSON file to `frontend/src/assets/i18n/` (e.g. `fr.json`)
+2. Add the language to `availableLangs` in `I18nService`
+3. Add the language to `availableLangs` in `app.config.ts` Transloco config
+4. Preload the new file in `I18nService` constructor
 
 ---
 

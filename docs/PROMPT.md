@@ -99,22 +99,35 @@ First run: browser will warn about the self-signed cert — type `thisisunsafe` 
 ```
 src/app/
 ├── core/
-│   ├── auth/            KeycloakService wrapper, authGuard, LoginPage, SessionCheckService
+│   ├── auth/            KeycloakService wrapper, authGuard, loginGuard, LoginPage, SessionCheckService
+│   ├── i18n/            I18nService — language persistence + TranslocoHttpLoader
 │   ├── interceptors/    auth (token injection), error (401 → re-login)
-│   ├── layout/          AppLayoutComponent — responsive shell (sidebar desktop / tab bar mobile)
+│   ├── layout/          AppLayoutComponent — responsive shell + nav-items.ts (single nav source of truth)
 │   ├── breakpoint.service.ts  Reactive `isMobile` signal via matchMedia('(max-width: 767px)')
 │   └── theme/           ThemeService — scheme (light/dark/system) + accent (clay/moss/dune/slate)
 ├── features/
 │   ├── home/            HomePage — greeting, avatar in header, quick-action cards
-│   ├── settings/        SettingsPage — accent/scheme picker, sign out
-│   ├── profile/         ProfilePage — user details (name, email, username, email verified)
+│   ├── settings/        SettingsPage — appearance picker (scheme, accent, language)
+│   ├── profile/         ProfilePage — user details, avatar hero, sign out
 │   └── example/         Full CRUD feature (list + detail pages, NgRx store, API service)
 ├── shared/              27 standalone components, all BEM-styled + Storybook stories
 │   └── index.ts         Barrel — import all shared components from here
-└── store/               Root NgRx registration (rootReducers, rootEffects)
+└── store/
+    ├── auth/            Auth slice — profile loaded once at boot (selectUserFullName, selectUserProfile)
+    └── index.ts         Root NgRx registration (rootReducers, rootEffects)
 ```
 
-Entry point: `src/main.ts` → `app.config.ts` (providers: router, store, Keycloak init, HTTP interceptors).
+Entry point: `src/main.ts` → `app.config.ts` (providers: router, store, Keycloak init, HTTP interceptors, Transloco).
+
+## Navigation
+
+`NAV_ITEMS` (`core/layout/nav-items.ts`) is the single source of truth for all navigation. It is consumed by both the desktop sidebar and the mobile tab bar, rendered via `@for` loops. Each item has:
+- `label` — transloco key (e.g. `'nav.home'`)
+- `tab` — Ionic tab identifier
+- `route` — Angular route path
+- `icon` / `iconActive` — ionicon names for inactive/active states
+
+The `AppLayoutComponent` renders `<app-sidebar>` on desktop and `<ion-tab-bar>` on mobile using the same `NAV_ITEMS` array. Navigation items: Home, Items, Profile, Settings.
 
 ## Theming
 
@@ -122,7 +135,26 @@ Entry point: `src/main.ts` → `app.config.ts` (providers: router, store, Keyclo
 
 - Call `theme.setScheme('light' | 'dark' | 'system')` and `theme.setAccent('clay' | 'moss' | 'dune' | 'slate' | null)`
 - CSS is in `src/theme/variables.scss` — 8 accent mixins × dark/light, applied via `body.dark` / `body[data-accent]`
-- The `SettingsPage` exposes the full UI (3-way segment + 5 swatches)
+- The `SettingsPage` exposes the full UI (3-way scheme segment + 5 accent swatches + language switcher)
+
+## Internationalization (i18n)
+
+Transloco (`@jsverse/transloco`) provides runtime language switching. Translation files live in `frontend/src/assets/i18n/` (`en.json`, `es.json`).
+
+- `I18nService` (`core/i18n/i18n.service.ts`) — manages the active language, persists to `localStorage`, exposes `activeLang` signal and `availableLangs`
+- `TranslocoHttpLoader` — loads translation JSON via HTTP on demand
+- `TranslocoPipe` (`| transloco`) — used in templates for all user-facing strings
+- `TranslocoService.translate()` — used imperatively in component code
+- Language switcher (English / Español) is exposed in the Settings page
+
+## Auth Store
+
+The `store/auth/` slice loads the user profile once at app boot and exposes it to all pages via selectors:
+
+- `selectUserFullName` — derived full name from profile
+- `selectUserProfile` — full Keycloak profile object (firstName, lastName, email, username, emailVerified)
+
+`PageHeaderComponent` is decoupled from auth — it accepts `userName` and `title` as `@Input()`s. Pages pull the user name from the store and pass it down, rather than having the header inject auth services.
 
 ## Shared components
 

@@ -164,12 +164,17 @@ pwa-ionic-python-template/
 ├── frontend/                        # Ionic/Angular PWA + Capacitor
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── core/                # Auth, interceptors, guards
-│   │   │   │   ├── auth/            # KeycloakService wrapper, authGuard, loginGuard, LoginPage
-│   │   │   │   └── interceptors/    # auth (Bearer token), error (401 → re-login)
+│   │   │   ├── core/                # Auth, i18n, interceptors, guards, layout
+│   │   │   │   ├── auth/            # KeycloakService wrapper, authGuard, loginGuard, LoginPage, SessionCheckService
+│   │   │   │   ├── i18n/            # I18nService, TranslocoHttpLoader
+│   │   │   │   ├── interceptors/    # auth (Bearer token), error (401 → re-login)
+│   │   │   │   ├── layout/          # AppLayoutComponent + nav-items.ts (sidebar + tab bar)
+│   │   │   │   ├── breakpoint.service.ts
+│   │   │   │   └── theme/           # ThemeService — scheme + accent
 │   │   │   ├── features/            # One folder per domain/feature
-│   │   │   │   ├── tabs/            # TabsPage — bottom navigation shell
-│   │   │   │   ├── home/            # HomePage — welcome screen
+│   │   │   │   ├── home/            # HomePage — greeting + quick-action cards
+│   │   │   │   ├── settings/        # SettingsPage — appearance picker (scheme, accent, language)
+│   │   │   │   ├── profile/         # ProfilePage — user details + sign out
 │   │   │   │   └── example/         # Full CRUD feature with NgRx store
 │   │   │   ├── shared/              # Reusable across features
 │   │   │   │   ├── components/      # UI components (each with a .stories.ts)
@@ -177,8 +182,8 @@ pwa-ionic-python-template/
 │   │   │   │   ├── pipes/           # TimeAgo, Truncate, Initials
 │   │   │   │   ├── directives/      # Autofocus, LongPress
 │   │   │   │   └── index.ts         # Barrel export for all shared items
-│   │   │   ├── store/               # Root NgRx store registration
-│   │   │   ├── app.config.ts        # App providers (router, store, Keycloak, interceptors)
+│   │   │   ├── store/               # Root NgRx store + auth slice
+│   │   │   ├── app.config.ts        # App providers (router, store, Keycloak, interceptors, Transloco)
 │   │   │   └── app.routes.ts        # Root routes (lazy-loaded)
 │   │   ├── environments/            # environment.ts / environment.prod.ts
 │   │   └── theme/                   # Ionic CSS variable overrides, global SCSS
@@ -374,6 +379,7 @@ features/example/store/
 3. Create `<name>.routes.ts` with lazy-loaded routes
 4. Register the reducer and effects in `src/app/store/index.ts`
 5. Add the lazy route to `src/app/app.routes.ts`
+6. If the feature needs a nav item, add it to `NAV_ITEMS` in `core/layout/nav-items.ts`
 
 ---
 
@@ -438,6 +444,16 @@ import { ToastService, AvatarComponent, TimeAgoPipe } from '@app/shared';
 |------------------------------|-----------------------------|--------------------------------------|
 | `SocialLoginButtonComponent` | `app-social-login-button`   | Google / Facebook login button       |
 | `LogoComponent`              | `app-logo`                  | App logo. Sizes: `sm` `md` `lg`      |
+
+#### Admin Dashboard
+
+| Component            | Selector          | Description                                                     |
+|----------------------|-------------------|-----------------------------------------------------------------|
+| `SidebarComponent`   | `app-sidebar`     | Collapsible nav sidebar with brand, icon-only mode, active state |
+| `StatCardComponent`  | `app-stat-card`   | Metric tile — icon, value, label, trend badge. 4 color variants  |
+| `DataTableComponent` | `app-data-table`  | Sortable table with ng-template actions, loading/empty states    |
+| `ActionMenuComponent`| `app-action-menu` | IonPopover dropdown with color-coded action items                |
+| `DrawerComponent`    | `app-drawer`      | Slide-from-right panel with footer slot projection               |
 
 ### Overlay Services
 
